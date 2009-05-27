@@ -1,0 +1,43 @@
+#  /////////////////////////////////////////////////////////////////////
+
+$(EXECUTABLE) : $(OBJECTS) 
+	$(CXX) $^ $(ALL_LFLAGS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBS) -o $@
+
+%.o : %.cpp
+	$(CXX) $(ALL_CFLAGS) -c $^ -o $@
+#  /////////////////////////////////////////////////////////////////////
+$(EXECUTABLE):	$(OBJECTS)
+ifeq ($(strip $(CPP_SOURCES)),)
+	$(CC)  $(ALL_LFLAGS) -o $(EXECUTABLE) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBS)
+else
+	$(CXX) $(ALL_LFLAGS) -o $(EXECUTABLE) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBS)
+endif
+ifeq ($(EXE_START),yes)
+				./$(EXECUTABLE) $(EXE_CMDLINE)
+endif
+
+%.o:		%.c
+	$(CC)  -c $(ALL_CFLAGS) $<
+
+%.o:		%.cc
+				$(CXX) -c $(ALL_CFLAGS) $<
+
+%.o:		%.cpp
+				$(CXX) -c $(ALL_CFLAGS) $<
+
+%.o:		%.C
+				$(CXX) -c $(ALL_CFLAGS) $<
+
+# ------------  make the prerequisites  ----------------------------------------
+#
+.%.d:   %.c
+				@$(make-prerequisite-c)
+
+.%.d:		%.cc
+				@$(make-prerequisite-cplusplus)
+
+.%.d:		%.cpp
+				@$(make-prerequisite-cplusplus)
+
+.%.d:		%.C
+				@$(make-prerequisite-cplusplus)
