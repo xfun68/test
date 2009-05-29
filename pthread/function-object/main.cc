@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     int32_t result = -1;
     int32_t retcode = -1;
     ThreadClass ta;
-    int32_t count = 8;
+    int32_t count = 10;
 
     if (0 != (retcode = ta.initialize())) {
         cout << "ThreadClass initialize with error[" << result << "]" << endl;
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 
     while (count--) {
         cout << "main thread count " << count << endl;
-        if (6 == count) {
+        if (5 == count) {
             ta.release();
         }
         sleep(1); 
