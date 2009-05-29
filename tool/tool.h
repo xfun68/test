@@ -18,7 +18,19 @@
 
 #include <inttypes.h>
 
+/*
+ * 功能：   获取当前进程能打开的最大文件描述符的数量
+ * 返回：
+ *  # 0     成功
+ *  # !=0   当前设置的最大数量
+ */
 int32_t getMaxFDSize(void);
+/*
+ * 功能：   设置当前进程能打开的最大文件描述符的数量
+ * 返回：
+ *  # 0     成功
+ *  # -1    失败
+ */
 int32_t setMaxFDSize(int32_t size);
 
 #endif //  _TOOL_H_
