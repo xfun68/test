@@ -29,7 +29,7 @@
 DEBUG          	:= YES
 
 # LIB can be set to YES to build a library not a executable program, or no otherwise
-LIB        		  := YES
+LIB        		  := NO
 
 # LIB_STYLE can be set to SHARE to build a share library, or no otherwise
 LIB_STYLE      	:= STATIC
@@ -38,10 +38,10 @@ MINOR_NUM       := 1
 RELEASE_NUM     := 090524
 
 # ------------  name of the target  ----------------------------------------
-PROGRAM_NAME    := tool
+PROGRAM_NAME    := func-obj-thread
 
 # ------------  list of all source files  --------------------------------------
-SOURCES         := tool.cpp
+SOURCES         := main.cc
 
 # ------------  other name of the target  ----------------------------------------
 ifeq (YES,${LIB})
@@ -112,7 +112,7 @@ GLOBAL_INC_DIR  =
 LOCAL_INC_DIR   =
 
 # ------------  system libraries  (e.g. -lm )  ---------------------------------
-SYS_LIBS        = -lm -lc
+SYS_LIBS        = -lm -lc -lpthread
 
 # ------------  additional system library directories  -------------------------
 GLOBAL_LIB_DIR  =
