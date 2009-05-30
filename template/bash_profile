@@ -1,0 +1,55 @@
+# .bashrc
+
+# User specific aliases and functions
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+export PS1="\[\e[32;1m\]\d \t \w\n\u@\h\$ \[\e[0m\]"
+
+export LS_COLORS='no=00:fi=00:di=33:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:';
+
+alias vi='vim'
+alias ll='ls -l -h --color=tty'
+alias lla='ll -a'
+alias pvim='vim +Project'
+alias tl='tail -f `ls | tail -n1`'
+alias taillog='tail -f `ls | tail -n1`'
+alias lf='ls | tail -n1'
+alias lastfile='ls | tail -n1'
+alias ff='ls | head -n1'
+alias firstfile='ls | head -n1'
+alias maked='make -f MakefileD'
+alias remake='make clean && make;'
+alias egrep='grep -E -a -i --color'
+alias erating_processes='echo "((USER|UID|PID).*(CMD|COMMAND))|rating|gatesvr|ausvr|chargesvr|paysvr|logsvr|monitsvr"'
+alias pp='ps xukuser,comm | egrep -v "grep|ps xuk" | egrep `erating_processes`'
+alias ph='ps -ejFH | egrep -v "grep |ps -ejF" | egrep `erating_processes`'
+alias pl='ps -ejFL | egrep -v "grep |ps -ejF" | egrep `erating_processes`'
+alias hi='history | less +G'
+
+ulimit -c 1000
+
+# LANG='zh_CN.gbk'
+LANG='en_US.UTF-8'
+export LANG
+
+PATH=$HOME/bin:$PATH
+PATH=$HOME/bin/gittools:$PATH
+export PATH
+
+SRC_HOME=$HOME/src/
+export SRC_HOME
+
+ORACLE_HOME=$HOME
+export ORACLE_HOME
+
+ESUITE_HOME=$HOME
+export ESUITE_HOME
+
+LD_LIBRARY_PATH=$HOME/lib
+LD_LIBRARY_PATH=$ORACLE_HOME/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH
+
