@@ -25,23 +25,21 @@
 #               section 4.13). The utility sed is used.
 #========================================== makefile template version 1.8 ====== }}}
 
-# DEBUG can be set to YES to include debugging info, or NO otherwise
-DEBUG          	:= YES
+# ------------  name of the target  ----------------------------------------
+PROGRAM_NAME    := test
+
+# ------------  list of all source files  --------------------------------------
+SOURCES         := main.cpp
 
 # LIB can be set to YES to build a library not a executable program, or no otherwise
-LIB        		  := YES
-
-# LIB_STYLE can be set to SHARE to build a share library, or no otherwise
+LIB        		  := NO
 LIB_STYLE      	:= STATIC
 VER_NUM         := 1
 MINOR_NUM       := 1
 RELEASE_NUM     := 090524
 
-# ------------  name of the target  ----------------------------------------
-PROGRAM_NAME    := tool
-
-# ------------  list of all source files  --------------------------------------
-SOURCES         := tool.cpp
+# DEBUG can be set to YES to include debugging info, or NO otherwise
+DEBUG          	:= YES
 
 # ------------  other name of the target  ----------------------------------------
 ifeq (YES,${LIB})
