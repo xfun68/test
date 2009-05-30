@@ -25,8 +25,45 @@ template <class T >
 void* threadFunc(void* args)
 {
     T* thread_class = (T*)args;
-    thread_class->runInThread();
+    thread_class->run();
     return NULL;
+}
+
+template <class T >
+int32_t runInThread(void* args)
+{
+    int32_t result = -1;
+    int32_t retcode = -1;
+    pthread_t tid = 0;
+
+    if (0 != (retcode = pthread_create(&tid, NULL,
+                threadFunc<T>, args))) {
+        perror("runInThread");
+        result = retcode;
+        goto ExitError;
+    }
+
+    result = 0;
+ExitError:
+    return result;
+}
+
+int32_t runInThread(void* (*threadFunc)(void*), void* args)
+{
+    int32_t result = -1;
+    int32_t retcode = -1;
+    pthread_t tid = 0;
+
+    if (0 != (retcode = pthread_create(&tid, NULL,
+                threadFunc, args))) {
+        perror("runInThread");
+        result = retcode;
+        goto ExitError;
+    }
+
+    result = 0;
+ExitError:
+    return result;
 }
 
 class ThreadClass {
@@ -35,7 +72,7 @@ public:
         be_release_(0) {
     }
 
-    void runInThread(void) {
+    void run(void) {
         int32_t count = 20;
         while (count--) {
             cout << "ThreadClass count      "
@@ -52,23 +89,9 @@ public:
 
     int32_t initialize(void) {
         int32_t result = -1;
-        int32_t retcode = -1;
-        pthread_t tid = 0;
 
         be_release_ = false;
-
-        if (0 != (retcode = pthread_create(&tid, NULL,
-                    threadFunc<ThreadClass>, this))) {
-            cout << "create thread failed with error["
-                << retcode
-                << "]"
-                << endl;
-            result = retcode;
-            goto ExitError;
-        }
-
         result = 0;
-ExitError:
         return result;
     }
 
@@ -80,6 +103,18 @@ ExitError:
 private:
     bool be_release_;
 };
+
+void* threadRun(void* args) {
+    int32_t count = 20;
+    while (count--) {
+        cout << "threadRun count            "
+            << count
+            << endl;
+
+        sleep(1);
+    }
+    return NULL;
+}
 
 int main(int argc, char* argv[])
 {
@@ -94,6 +129,22 @@ int main(int argc, char* argv[])
         goto ExitError;
     } else {
         cout << "ThreadClass initialize OK" << endl;
+    }
+
+    if (0 != (retcode = runInThread<ThreadClass>(&ta))) {
+        cout << "runInThread(class) with error[" << result << "]" << endl;
+        result = retcode;
+        goto ExitError;
+    } else {
+        cout << "runInThread(class) OK" << endl;
+    }
+
+    if (0 != (retcode = runInThread(threadRun, NULL))) {
+        cout << "runInThread(function) with error[" << result << "]" << endl;
+        result = retcode;
+        goto ExitError;
+    } else {
+        cout << "runInThread(function) OK" << endl;
     }
 
     while (count--) {
