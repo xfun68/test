@@ -21,11 +21,11 @@
 
 using namespace std;
 
-template <class T, void (T::*runInThreadThread)(void) >
+template <class T >
 void* threadFunc(void* args)
 {
     T* thread_class = (T*)args;
-    thread_class->runInThreadThread();
+    thread_class->runInThread();
     return NULL;
 }
 
@@ -35,7 +35,7 @@ public:
         be_release_(0) {
     }
 
-    void runInThreadThread(void) {
+    void runInThread(void) {
         int32_t count = 20;
         while (count--) {
             cout << "ThreadClass count      "
@@ -58,7 +58,7 @@ public:
         be_release_ = false;
 
         if (0 != (retcode = pthread_create(&tid, NULL,
-                    threadFunc<ThreadClass, &ThreadClass::runInThreadThread>, this))) {
+                    threadFunc<ThreadClass>, this))) {
             cout << "create thread failed with error["
                 << retcode
                 << "]"
