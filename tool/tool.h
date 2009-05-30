@@ -20,6 +20,12 @@
 #include <pthread.h>
 #include <inttypes.h>
 
+#define ASSURE_SUCCESS(RESULT, RETCODE, STATEMENT) \
+    if (S_SUCCESS != (RETCODE = (STATEMENT))) {\
+        RESULT = RETCODE;\
+        goto ExitError;\
+    }
+
 /*
  * 功能：   获取当前进程能打开的最大文件描述符的数量
  * 返回：
@@ -42,8 +48,43 @@ template <class T >
 void* threadFunc(void* args)
 {
     T* thread_class = (T*)args;
-    thread_class->runInThread();
+    thread_class->run();
     return NULL;
+}
+
+template <class T >
+int32_t runInThread(void* args)
+{
+    int32_t result = -1;
+    int32_t retcode = -1;
+    pthread_t tid = 0;
+
+    if (0 != (retcode = pthread_create(&tid, NULL,
+                threadFunc<T>, args))) {
+        result = retcode;
+        goto ExitError;
+    }
+
+    result = 0;
+ExitError:
+    return result;
+}
+
+int32_t runInThread(void* (*threadFunc)(void*), void* args)
+{
+    int32_t result = -1;
+    int32_t retcode = -1;
+    pthread_t tid = 0;
+
+    if (0 != (retcode = pthread_create(&tid, NULL,
+                threadFunc, args))) {
+        result = retcode;
+        goto ExitError;
+    }
+
+    result = 0;
+ExitError:
+    return result;
 }
 
 #endif //  _TOOL_H_
