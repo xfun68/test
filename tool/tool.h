@@ -16,6 +16,8 @@
 
 #ifndef _TOOL_H_
 
+#include <time.h>
+#include <pthread.h>
 #include <inttypes.h>
 
 /*
@@ -32,6 +34,17 @@ int32_t getMaxFDSize(void);
  *  # -1    失败
  */
 int32_t setMaxFDSize(int32_t size);
+
+/*
+ * 功能：   线程函数模板
+ */
+template <class T >
+void* threadFunc(void* args)
+{
+    T* thread_class = (T*)args;
+    thread_class->runInThread();
+    return NULL;
+}
 
 #endif //  _TOOL_H_
 
