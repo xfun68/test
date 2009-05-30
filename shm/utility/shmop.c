@@ -20,7 +20,7 @@ static void  catcher();
 extern void  exit();
 static   good_addr();
 extern void  perror();
-// extern char  *shmat();
+extern void  *shmat();
 
 static struct state     { /* Internal record of currently attached
                              segments. */

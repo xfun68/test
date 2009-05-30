@@ -26,6 +26,9 @@
         goto ExitError;\
     }
 
+#define PUT_ERR(TAG) \
+    printf("%s: [%d] %s\n", TAG, errno, strerror(errno));
+
 /*
  * 功能：   获取当前进程能打开的最大文件描述符的数量
  * 返回：
