@@ -26,8 +26,8 @@ alias remake='make clean && make;'
 alias egrep='grep -E -a -i --color'
 alias erating_processes='echo "((USER|UID|PID).*(CMD|COMMAND))|rating|gatesvr|cli|ausvr|chargesvr|paysvr|logsvr|monitsvr"'
 alias pp='ps xukuser,comm | egrep -v "grep|ps xuk" | egrep `erating_processes`'
-alias ph='ps -ejFH | egrep -v "grep |ps -ejF" | egrep `erating_processes`'
-alias pl='ps -ejFL | egrep -v "grep |ps -ejF" | egrep `erating_processes`'
+alias ph='ps -ejFH --sort=cmd | egrep -v "grep |ps -ejF" | egrep `erating_processes`'
+alias pl='ps -ejFL --sort=cmd | egrep -v "grep |ps -ejF" | egrep `erating_processes`'
 alias hi='history | less +G'
 
 ulimit -c 1000
