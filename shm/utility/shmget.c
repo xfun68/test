@@ -22,10 +22,8 @@ main()
     int  shmid;   /* return value from shmget() */
     int  size;   /* size to be passed to shmget() */
 
-    (void) fprintf(stderr,
-        "All numeric input is expected to follow C conventions:\n");
-    (void) fprintf(stderr,
-        "\t0x... is interpreted as hexadecimal,\n");
+    (void) fprintf(stderr, "All numeric input is expected to follow C conventions:\n");
+    (void) fprintf(stderr, "\t0x... is interpreted as hexadecimal,\n");
     (void) fprintf(stderr, "\t0... is interpreted as octal,\n");
     (void) fprintf(stderr, "\totherwise, decimal.\n");
 
