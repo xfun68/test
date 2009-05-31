@@ -35,20 +35,12 @@ ulimit -c 1000
 # LANG='zh_CN.gbk'
 LANG='en_US.UTF-8'
 export LANG
+export SVN_EDITOR=$HOME/bin/vim
 
 PATH=$HOME/bin:$PATH
-PATH=$HOME/bin/gittools:$PATH
+PATH=$HOME/libexec/git-core:$PATH
 export PATH
-
-ORACLE_HOME=$HOME
-export ORACLE_HOME
-
-ESUITE_HOME=$HOME
-export ESUITE_HOME
-
-LD_LIBRARY_PATH=$HOME/lib
-LD_LIBRARY_PATH=$ORACLE_HOME/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH
-
-export SVN_EDITOR=$HOME/bin/vim
+export ORACLE_HOME=$HOME
+export ESUITE_HOME=$HOME/src/esuite
+export LD_LIBRARY_PATH=$HOME/lib
 
