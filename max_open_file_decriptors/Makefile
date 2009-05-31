@@ -29,7 +29,7 @@
 PROGRAM_NAME    := test
 
 # ------------  list of all source files  --------------------------------------
-SOURCES         := main.cpp
+SOURCES         := max_open_file_descriptors.cc
 
 # LIB can be set to YES to build a library not a executable program, or no otherwise
 LIB        		  := NO
