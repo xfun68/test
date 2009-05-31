@@ -15,9 +15,9 @@ alias vi='vim'
 alias ll='ls -l -h --color=tty'
 alias lla='ll -a'
 alias pvim='vim +Project'
-alias tl='tail -f `ls | tail -n1`'
-alias taillog='tail -f `ls | tail -n1`'
-alias lf='ls | tail -n1'
+alias tl='tail -f -n1000 `lf`'
+alias taillog='tail -f -n1000 `lf`'
+alias lf='ls 2009-* | tail -n1'
 alias lastfile='ls | tail -n1'
 alias ff='ls | head -n1'
 alias firstfile='ls | head -n1'
@@ -40,9 +40,6 @@ PATH=$HOME/bin:$PATH
 PATH=$HOME/bin/gittools:$PATH
 export PATH
 
-SRC_HOME=$HOME/src/
-export SRC_HOME
-
 ORACLE_HOME=$HOME
 export ORACLE_HOME
 
@@ -52,4 +49,6 @@ export ESUITE_HOME
 LD_LIBRARY_PATH=$HOME/lib
 LD_LIBRARY_PATH=$ORACLE_HOME/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH
+
+export SVN_EDITOR=$HOME/bin/vim
 
