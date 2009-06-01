@@ -18,7 +18,7 @@
 #include "event_handler.h"
 #include "connection_manager.h"
 #include "tool.h"
-#include "ipc_msg_queue.h"
+#include "shm_msg_queue.h"
 
 #include <signal.h>
 #include <stdlib.h>
@@ -38,8 +38,8 @@ int main (int argc, char *argv[])
 {
     // 声明
     int32_t result = -1;
-    IPCMsgQueue ipc_stoc_q(0);
-    IPCMsgQueue ipc_ctos_q(1);
+    SHMMsgQueue shm_stoc_q(0);
+    SHMMsgQueue shm_ctos_q(1);
 
     // 进程唯一约束、设置信号处理函数
     instanceRestrict(argv[0]);/*{{{*/
@@ -48,29 +48,42 @@ int main (int argc, char *argv[])
     signal(SIGINT, sigExit);
     signal(SIGTERM, sigExit);/*}}}*/
 
-    // 初始化 IPCMsgQueue
-    if ((S_SUCCESS != ipc_stoc_q.initialize(0x10)) ||/*{{{*/
-       ((S_SUCCESS != ipc_ctos_q.initialize(0x11)))) {
-        puts("IPCMsgQueue initialize failed");
+    // 初始化 SHMMsgQueue
+    if ((S_SUCCESS != shm_stoc_q.initialize(0x10)) ||/*{{{*/
+       ((S_SUCCESS != shm_ctos_q.initialize(0x11)))) {
+        puts("SHMMsgQueue initialize failed");
         goto ExitError;
     }
-    puts("IPCMsgQueue initialize OK");/*}}}*/
+    puts("SHMMsgQueue initialize OK");/*}}}*/
 
-
-    // 控制主线程是否结束
     while (g_count > 0) {/*{{{*/
+        printf("SHMMsgQueue size: %u\n", shm_stoc_q.size());
+        while (shm_stoc_q.size() > 0) {
+            SHMMsg& msg = shm_stoc_q.front();
+            if (shm_stoc_q.pop() < 0) {
+                printf("SHMMsgQueue pop failed ");
+                continue;
+            } else {
+                printf("SHMMsgQueue pop OK ");
+            }
+            cout << "head: " << shm_stoc_q.head()
+                << " tail: " << shm_stoc_q.tail()
+                << " size: " << shm_stoc_q.size()
+                << endl;
+            snprintf("SHMCli read ipc msg [%s]\n", msg.len_, (char*)msg.data_);
+        }
         sleep(1);
     }/*}}}*/
 
     result = 0;
 ExitError:
-    // 释放 IPCMsgQueue
-    if ((S_SUCCESS != ipc_stoc_q.release()) ||/*{{{*/
-       ((S_SUCCESS != ipc_ctos_q.release()))) {
-        puts("IPCMsgQueue release failed");
+    // 释放 SHMMsgQueue
+    if ((S_SUCCESS != shm_stoc_q.release()) ||/*{{{*/
+       ((S_SUCCESS != shm_ctos_q.release()))) {
+        puts("SHMMsgQueue release failed");
         goto ExitError;
     }
-    puts("IPCMsgQueue release OK");/*}}}*/
+    puts("SHMMsgQueue release OK");/*}}}*/
 
     if (0 == result) {/*{{{*/
         puts("program exit OK");

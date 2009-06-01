@@ -40,7 +40,7 @@ PROGRAM_NAME    := ipccli
 
 # ------------  list of all source files  --------------------------------------
 SOURCES         := ipccli.cpp \
-		ipc_msg_queue.cpp
+		shm_msg_queue.cpp
 
 # ------------  other name of the target  ----------------------------------------
 ifeq (YES,${LIB})

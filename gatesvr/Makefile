@@ -40,7 +40,7 @@ PROGRAM_NAME    := gatesvr
 
 # ------------  list of all source files  --------------------------------------
 SOURCES         := gatesvr.cpp \
-		ipc_msg_queue.cpp
+		shm_msg_queue.cpp
 
 # ------------  other name of the target  ----------------------------------------
 ifeq (YES,${LIB})

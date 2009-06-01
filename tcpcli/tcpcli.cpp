@@ -86,8 +86,8 @@ int main (int argc, char *argv[])
 {/*{{{*/
     // 声明
     int32_t result = -1;/*{{{*/
-    ConnectionManager cm;
-    CliHandler ch("CliHandler");/*}}}*/
+    CliHandler ch("CliHandler");
+    ConnectionManager cm(&ch);/*}}}*/
 
     instanceRestrict(argv[0]);
     signal(SIGHUP, SIG_IGN);/*{{{*/
@@ -103,7 +103,7 @@ int main (int argc, char *argv[])
     puts("ConnectionManager initialize OK");/*}}}*/
 
     // 2、设置自己的处理器
-    cm.setEventHandler(&ch);
+    // cm.setEventHandler(&ch);
 
     // 3、使 ConnectionManager 在单独的线程中运行
     if (0 != runInThread<ConnectionManager>(&cm)) {/*{{{*/

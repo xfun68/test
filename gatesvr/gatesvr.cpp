@@ -18,8 +18,7 @@
 #include "event_handler.h"
 #include "connection_manager.h"
 #include "tool.h"
-#include "ipc_msg_queue.h"
-
+#include "shm_msg_queue.h"
 #include <signal.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -40,27 +39,26 @@ public:
     GateSvr(void) : 
         EventHandler("GateSvr"),
         conn_(NULL),
-        ipc_stoc_q(1),
-        ipc_ctos_q(0),
-        msg_count_(0) { }
+        cm_(this),
+        shm_stoc_q(1),
+        shm_ctos_q(0) {}
 
     int32_t initialize(void) {
         int32_t result = E_ERROR;
 
         // 初始化资源
-        if ((S_SUCCESS != ipc_stoc_q.initialize(0x10)) ||/*{{{*/
-            ((S_SUCCESS != ipc_ctos_q.initialize(0x11)))) {
-            puts("IPCMsgQueue initialize failed");
+        if ((S_SUCCESS != shm_stoc_q.initialize(0x10)) ||/*{{{*/
+            ((S_SUCCESS != shm_ctos_q.initialize(0x11)))) {
+            puts("SHMMsgQueue initialize failed");
             goto ExitError;
         }
-        puts("IPCMsgQueue initialize OK");/*}}}*/
+        puts("SHMMsgQueue initialize OK");/*}}}*/
 
-        if (S_SUCCESS != cm.initialize()) {/*{{{*/
+        if (S_SUCCESS != cm_.initialize()) {/*{{{*/
             puts("ConnectionManager initialize failed");
             goto ExitError;
         }
         puts("ConnectionManager initialize OK");/*}}}*/
-        cm.setEventHandler(this);
 
         result = S_SUCCESS;
 ExitError:
@@ -71,18 +69,18 @@ ExitError:
         int32_t result = E_ERROR;
 
         // 释放资源
-        if (S_SUCCESS != cm.release()) {/*{{{*/
+        if (S_SUCCESS != cm_.release()) {/*{{{*/
             puts("ConnectionManager release failed");
             result = -1;
         }
         puts("ConnectionManager release OK");/*}}}*/
 
-        if ((S_SUCCESS != ipc_stoc_q.release()) ||/*{{{*/
-            ((S_SUCCESS != ipc_ctos_q.release()))) {
-            puts("IPCMsgQueue release failed");
+        if ((S_SUCCESS != shm_stoc_q.release()) ||/*{{{*/
+            ((S_SUCCESS != shm_ctos_q.release()))) {
+            puts("SHMMsgQueue release failed");
             goto ExitError;
         }
-        puts("IPCMsgQueue release OK");/*}}}*/
+        puts("SHMMsgQueue release OK");/*}}}*/
 
         result = S_SUCCESS;
 ExitError:
@@ -93,7 +91,7 @@ ExitError:
         int32_t result = E_ERROR;
 
         // 使 ConnectionManager 在单独的线程中运行
-        if (0 != runInThread<ConnectionManager>(&cm)) {/*{{{*/
+        if (0 != runInThread<ConnectionManager>(&cm_)) {/*{{{*/
             cout << "runInThread(ConnectionManager) failed" << endl;
             goto ExitError;
         }
@@ -112,7 +110,7 @@ ExitError:
             goto ExitOK;
         }
         // 创建监听连接
-        if (S_SUCCESS != cm.createConnection(0U, 12345, conn_)) {/*{{{*/
+        if (S_SUCCESS != cm_.createConnection(0U, 12345, conn_)) {/*{{{*/
             printf("create connection failed\n");
             goto ExitError;
         }
@@ -120,7 +118,7 @@ ExitError:
         conn_->set_event_handler(this);
 
         if (S_SUCCESS != conn_->listen()) {
-            printf("listen at port %u failed\n", conn_->port());
+            printf("listen failed\n");
             goto ExitError;
         }
         printf("listen at port %u OK\n", conn_->port());/*}}}*/
@@ -131,37 +129,43 @@ ExitError:
         return S_SUCCESS;
     }
 
-    int32_t onRelease(Connection* conn) {
+    int32_t onListenFailed(Connection* conn) {
         conn->set_auto_release(true);
         conn_ = NULL;
         return S_SUCCESS;
     }
 
-    int32_t onRead(Connection* conn_) {
-        EventHandler::onRead(conn_);
-        IPCMsg& msg = ipc_stoc_q.end();
-        msg.setSequenceID(++msg_count_);
-        if (1 == ipc_stoc_q.push(msg)) {
-            printf("GateSvr::IPCMsgQueue::push OK"
-                " sequenceID: 0X%08X"
-                " head: %u"
-                " tail: %u"
-                " size: %u\n",
-                msg_count_,
-                );
-        } else {
-            printf("GateSvr::IPCMsgQueue::push failed sequenceID: 0X%08X\n",
-                msg_count_);
+    int32_t onRelease(Connection* conn) {
+        conn->set_auto_release(true);
+        if (conn_ == conn) {
+            conn_ = NULL;
         }
-        return 1;
+        return S_SUCCESS;
+    }
+
+    int32_t onRead(Connection* conn) {
+        int32_t retcode = -1;
+
+        SHMMsg& msg = shm_stoc_q.end();
+        conn->read((void*)&msg.data_, MAX_SHMMSG_DATA_SIZE, msg.len_);
+
+        if ((retcode = shm_stoc_q.push(msg)) < 0) {
+            cout << "GateSvr::SHMMsgQueue::push failed ";
+        } else {
+            cout << "GateSvr::SHMMsgQueue::push OK ";
+        }
+        printf(" head: %u", shm_stoc_q.head());
+        printf(" tail: %u", shm_stoc_q.tail());
+        printf(" size: %u\n", shm_stoc_q.size());
+
+        return 0;
     }
 
 private:
     Connection* conn_;
-    IPCMsgQueue ipc_stoc_q;
-    IPCMsgQueue ipc_ctos_q;
-    uint32_t msg_count_;
-    ConnectionManager cm;
+    ConnectionManager cm_;
+    SHMMsgQueue shm_stoc_q;
+    SHMMsgQueue shm_ctos_q;
 };
 
 int main (int argc, char *argv[])
