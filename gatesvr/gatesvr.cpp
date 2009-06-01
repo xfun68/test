@@ -39,7 +39,7 @@ class GateSvr : public EventHandler {
 public:
     GateSvr(void) : 
         EventHandler("GateSvr"),
-        conn(NULL),
+        conn_(NULL),
         ipc_stoc_q(1),
         ipc_ctos_q(0),
         msg_count_(0) { }
@@ -60,7 +60,9 @@ public:
             goto ExitError;
         }
         puts("ConnectionManager initialize OK");/*}}}*/
+        cm.setEventHandler(this);
 
+        result = S_SUCCESS;
 ExitError:
         return result;
     }
@@ -82,6 +84,7 @@ ExitError:
         }
         puts("IPCMsgQueue release OK");/*}}}*/
 
+        result = S_SUCCESS;
 ExitError:
         return S_SUCCESS;
     }
@@ -105,21 +108,22 @@ ExitError:
         int32_t result = E_ERROR;
 
         EventHandler::onBeginLoop(connMgr);
-        if (conn != NULL) {
+        if (conn_ != NULL) {
             goto ExitOK;
         }
         // 创建监听连接
-        if (S_SUCCESS != cm.createConnection(0U, 12345, conn)) {/*{{{*/
+        if (S_SUCCESS != cm.createConnection(0U, 12345, conn_)) {/*{{{*/
             printf("create connection failed\n");
             goto ExitError;
         }
         printf("create connection OK\n");
+        conn_->set_event_handler(this);
 
-        if (S_SUCCESS != conn->listen()) {
-            printf("listen at port %u failed\n", conn->port());
+        if (S_SUCCESS != conn_->listen()) {
+            printf("listen at port %u failed\n", conn_->port());
             goto ExitError;
         }
-        printf("listen at port %u OK\n", conn->port());/*}}}*/
+        printf("listen at port %u OK\n", conn_->port());/*}}}*/
 
 ExitOK:
         result = S_SUCCESS;
@@ -127,19 +131,36 @@ ExitError:
         return S_SUCCESS;
     }
 
-    int32_t onRead(Connection* conn) {
-        EventHandler::onRead(conn);
+    int32_t onRelease(Connection* conn) {
+        conn->set_auto_release(true);
+        conn_ = NULL;
+        return S_SUCCESS;
+    }
+
+    int32_t onRead(Connection* conn_) {
+        EventHandler::onRead(conn_);
         IPCMsg& msg = ipc_stoc_q.end();
         msg.setSequenceID(++msg_count_);
-        ipc_stoc_q.push(msg);
+        if (1 == ipc_stoc_q.push(msg)) {
+            printf("GateSvr::IPCMsgQueue::push OK"
+                " sequenceID: 0X%08X"
+                " head: %u"
+                " tail: %u"
+                " size: %u\n",
+                msg_count_,
+                );
+        } else {
+            printf("GateSvr::IPCMsgQueue::push failed sequenceID: 0X%08X\n",
+                msg_count_);
+        }
         return 1;
     }
 
 private:
-    Connection* conn;
+    Connection* conn_;
     IPCMsgQueue ipc_stoc_q;
     IPCMsgQueue ipc_ctos_q;
-    int32_t msg_count_;
+    uint32_t msg_count_;
     ConnectionManager cm;
 };
 

@@ -22,6 +22,9 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>/*}}}*/
 
+// TODO LIST
+// 解决push覆盖问题
+
 IPCMsgQueue::IPCMsgQueue(bool push_side) :
     data_(NULL),/*{{{*/
     shmid_(-1),
@@ -88,13 +91,37 @@ ExitOK:
     return result;
 }
 
+IPCMsg& IPCMsgQueue::front(void)
+{
+    if (NULL == data_) {
+        return def_msg_;
+    }
+    if (empty()) {
+        return def_msg_;
+    } else {
+        return data_->queue_[data_->head_ % MAX_IPCMSG_QUEUE_SIZE];
+    }
+}
+
+const IPCMsg& IPCMsgQueue::front(void) const
+{
+    if (NULL == data_) {
+        return def_msg_;
+    }
+    if (empty()) {
+        return def_msg_;
+    } else {
+        return data_->queue_[data_->head_ % MAX_IPCMSG_QUEUE_SIZE];
+    }
+}
+
 IPCMsg& IPCMsgQueue::back(void)
 {
     if (NULL == data_) {
         return def_msg_;
     }
     if (empty()) {
-        return data_->queue_[data_->head_ % MAX_IPCMSG_QUEUE_SIZE];
+        return def_msg_;
     } else {
         return data_->queue_[(data_->tail_ - 1) % MAX_IPCMSG_QUEUE_SIZE];
     }
@@ -106,18 +133,10 @@ const IPCMsg& IPCMsgQueue::back(void) const
         return def_msg_;
     }
     if (empty()) {
-        return data_->queue_[data_->head_ % MAX_IPCMSG_QUEUE_SIZE];
+        return def_msg_;
     } else {
         return data_->queue_[(data_->tail_ - 1) % MAX_IPCMSG_QUEUE_SIZE];
     }
-}
-
-bool IPCMsgQueue::empty(void) const
-{
-    if (NULL == data_) {
-        return true;
-    }
-    return (data_->head_ == data_->tail_);
 }
 
 IPCMsg& IPCMsgQueue::end(void)
@@ -136,41 +155,44 @@ const IPCMsg& IPCMsgQueue::end(void) const
     return data_->queue_[data_->tail_ % MAX_IPCMSG_QUEUE_SIZE];
 }
 
-IPCMsg& IPCMsgQueue::front(void)
+bool IPCMsgQueue::empty(void) const
 {
     if (NULL == data_) {
-        return def_msg_;
+        return true;
     }
-    return data_->queue_[0];
+    return (data_->head_ == data_->tail_);
 }
 
-const IPCMsg& IPCMsgQueue::front(void) const
+int32_t IPCMsgQueue::pop(void)
 {
     if (NULL == data_) {
-        return def_msg_;
+        return 0;
     }
-    return data_->queue_[0];
-}
 
-void IPCMsgQueue::pop(void)
-{
-    if (NULL == data_) {
-        return;
-    }
-    ++data_->head_;
-}
-
-void IPCMsgQueue::push(const IPCMsg& val)
-{
-    if (NULL == data_) {
-        return;
-    }
-    if (&val == &(data_->queue_[data_->tail_++ % MAX_IPCMSG_QUEUE_SIZE])) {
-        puts("---------------- fast push ----------------");
-        ++data_->tail_;
+    if (size() <= 0) {
+        return 0;
     } else {
-        data_->queue_[data_->tail_++ % MAX_IPCMSG_QUEUE_SIZE] = val;
+        ++data_->head_;
+        return 1;
     }
+}
+
+int32_t IPCMsgQueue::push(const IPCMsg& val)
+{
+    if (NULL == data_) {
+        return 0;
+    }
+
+    if (size() >= MAX_IPCMSG_QUEUE_SIZE) {
+        return 0;
+    }
+
+    IPCMsg& end_msg = data_->queue_[data_->tail_ % MAX_IPCMSG_QUEUE_SIZE];
+    if (&val != &end_msg) {
+        end_msg = val;
+    }
+    ++data_->tail_;
+    return 1;
 }
 
 uint32_t IPCMsgQueue::size(void) const
@@ -178,6 +200,24 @@ uint32_t IPCMsgQueue::size(void) const
     if (NULL == data_) {
         return 0U;
     }
-    return (MAX_IPCMSG_QUEUE_SIZE - (data_->tail_ - data_->head_));
+    return (uint32_t)(data_->tail_ - data_->head_);
+}
+
+uint64_t IPCMsgQueue::head(void) const
+{
+    if (NULL == data_) {
+        return 0U;
+    }
+
+    return data_->head_;
+}
+
+uint64_t IPCMsgQueue::tail(void) const
+{
+    if (NULL == data_) {
+        return 0U;
+    }
+
+    return data_->tail_;
 }
 

@@ -23,12 +23,9 @@
 const uint32_t MAX_IPCMSG_DATA_SIZE = 1024;
 const uint32_t MAX_IPCMSG_QUEUE_SIZE = 1024;
 
-/*{{{
 struct IPCMsg {
     int8_t data[MAX_IPCMSG_DATA_SIZE];
 };
-}}}*/
-typedef SysProtocol IPCMsg;
 
 struct IPCMsgQueueData {
     uint64_t head_;
@@ -43,16 +40,21 @@ public:
 
     int32_t initialize(uint32_t appID);
     int32_t release(void);
-    IPCMsg& back(void);
-    const IPCMsg& back(void) const;
-    bool empty(void) const;
-    IPCMsg& end(void);
-    const IPCMsg& end(void) const;
+
     IPCMsg& front(void);
+    IPCMsg& back(void);
+    IPCMsg& end(void);
+    const IPCMsg& back(void) const;
+    const IPCMsg& end(void) const;
     const IPCMsg& front(void) const;
-    void pop(void);
-    void push(const IPCMsg& val);
+
+    int32_t pop(void);
+    int32_t push(const IPCMsg& val);
+
+    bool empty(void) const;
     uint32_t size(void) const;
+    uint64_t head(void) const;
+    uint64_t tail(void) const;
 
 private:
     IPCMsgQueue(void);
