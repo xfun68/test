@@ -18,7 +18,7 @@
 #include "event_handler.h"
 #include "connection_manager.h"
 #include "tool.h"
-#include "shm_msg_queue.h"
+#include "loop_queue.h"
 #include <signal.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -157,6 +157,7 @@ ExitError:
         printf(" head: %u", shm_stoc_q.head());
         printf(" tail: %u", shm_stoc_q.tail());
         printf(" size: %u\n", shm_stoc_q.size());
+        printf("    ===> %d:[%s]\n", msg.len_, msg.data_);
 
         return 0;
     }

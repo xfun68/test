@@ -70,7 +70,7 @@ export SVN_EDITOR=$HOME/bin/vim
 PATH=$HOME/bin:$PATH
 PATH=$HOME/libexec/git-core:$PATH
 export PATH
-export ORACLE_HOME=$HOME
+export ORACLE_HOME=$HOME/src/oracle
 export ESUITE_HOME=$HOME/src/esuite
 export LD_LIBRARY_PATH=$HOME/lib
 

@@ -104,7 +104,7 @@ ifeq (YES, ${PROFILE})
 endif
 
 # ------------  additional system include directories  -------------------------
-GLOBAL_INC_DIR  = $(HOME)/src/base
+GLOBAL_INC_DIR  = $(HOME)/src/test/base
 
 # ------------  private include directories  -----------------------------------
 LOCAL_INC_DIR   =
@@ -115,7 +115,7 @@ SYS_LIBS        = pthread \
 									c
 
 # ------------  additional system library directories  -------------------------
-GLOBAL_LIB_DIR  = $(HOME)/src/base
+GLOBAL_LIB_DIR  = $(HOME)/src/test/base
 
 # ------------  additional system libraries  -----------------------------------
 GLOBAL_LIBS     = base
