@@ -39,8 +39,7 @@ DEBUG          	:= YES
 PROGRAM_NAME    := ipccli
 
 # ------------  list of all source files  --------------------------------------
-SOURCES         := ipccli.cpp \
-		shm_msg_queue.cpp
+SOURCES         := ipccli.cpp
 
 # ------------  other name of the target  ----------------------------------------
 ifeq (YES,${LIB})

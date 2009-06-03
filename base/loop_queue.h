@@ -24,14 +24,15 @@ public:
     }
 
     ~LoopQueue(void) {
-        hdr_ = data_ = NULL;
+        hdr_ = NULL;
+        data_ = NULL;
     }
 
     ElemTypeRef front(void) {
         if (NULL == hdr_) {
             return def_msg_;
         } else {
-            if (rsize() <= 0) {
+            if (rsize() < 0) {
                 return def_msg_;
             } else {
                 return at(head());
@@ -93,7 +94,7 @@ public:
             if (rsize() <= 0) {
                 return -1;
             } else {
-                hdr_->head_ = ++head();
+                hdr_->head_ = head()+1;
                 return 0;
             }
         }
@@ -106,7 +107,7 @@ public:
             if (&val != &(end())) {
                 end() = val;
             }
-            hdr_->tail_ = ++tail();
+            hdr_->tail_ = tail()+1;
             return 0;
         }
     }
@@ -139,7 +140,7 @@ public:
         if (NULL == hdr_) {
             return 0;
         } else {
-            return hdr_->tail_ - hdr_->head;
+            return hdr_->tail_ - hdr_->head_;
         }
     }
 
@@ -160,7 +161,7 @@ public:
             return -1;
         } else {
             if (rsize() < 0) {
-                return hdr_->head;
+                return hdr_->head_;
             } else {
                 return hdr_->tail_;
             }
@@ -169,7 +170,8 @@ public:
 
     int32_t setQueueAddr(void* const addr) {
         if (NULL == addr) {
-            hdr_ = data_ = NULL;
+            hdr_ = NULL;
+            data_ = NULL;
         } else {
             hdr_ = (QueueHdrPtr)addr;
             data_ = (ElemTypePtr)((int8_t*)addr + sizeof(QueueHdr));
@@ -177,7 +179,7 @@ public:
         return 0;
     }
 
-    int32_t setQueueAddr(void* const addr, uint32_t capacity, size_t elem_size) {
+    int32_t setQueueAddr(void* const addr, size_t elem_size, uint32_t capacity) {
         if (NULL == addr) {
             return -1;
         } else {

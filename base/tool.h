@@ -15,8 +15,10 @@
 // =====================================================================================
 
 #ifndef _TOOL_H_
+#define _TOOL_H_
 
 #include <time.h>
+#include <errno.h>
 #include <pthread.h>
 #include <inttypes.h>
 

@@ -62,6 +62,7 @@ SOURCES         := connection.cpp \
 		sockaddr_in.cpp \
 		sockfd.cpp \
 		app_buffer.cpp \
+		shm.cpp \
 		tool.cpp
 else
 SOURCES         := connection.cpp \
@@ -71,6 +72,7 @@ SOURCES         := connection.cpp \
 		sockfd.cpp \
 		app_buffer.cpp \
 		tool.cpp \
+		shm.cpp \
 		main.cpp
 endif
 

@@ -18,7 +18,8 @@
 #include "event_handler.h"
 #include "connection_manager.h"
 #include "tool.h"
-#include "shm_msg_queue.h"
+#include "loop_queue.h"
+#include "shm.h"
 
 #include <signal.h>
 #include <stdlib.h>
@@ -28,6 +29,12 @@
 using namespace std;
 
 int32_t g_count = 100;
+uint8_t g_app_id = 0x10;
+const int32_t DATA_LEN = 64;
+struct DataUnit {
+    int32_t len;
+    int8_t data[DATA_LEN];
+};
 
 void sigExit(int signo) {/*{{{*/
     g_count = 0;
@@ -38,8 +45,10 @@ int main (int argc, char *argv[])
 {
     // 声明
     int32_t result = -1;
-    SHMMsgQueue shm_stoc_q(0);
-    SHMMsgQueue shm_ctos_q(1);
+    int32_t shmid = -1;
+    void* addr = NULL;
+    LoopQueue<DataUnit> shm_stoc_q;
+    LoopQueue<DataUnit> shm_ctos_q;
 
     // 进程唯一约束、设置信号处理函数
     instanceRestrict(argv[0]);/*{{{*/
@@ -48,43 +57,53 @@ int main (int argc, char *argv[])
     signal(SIGINT, sigExit);
     signal(SIGTERM, sigExit);/*}}}*/
 
-    // 初始化 SHMMsgQueue
-    if ((S_SUCCESS != shm_stoc_q.initialize(0x10)) ||/*{{{*/
-       ((S_SUCCESS != shm_ctos_q.initialize(0x11)))) {
-        puts("SHMMsgQueue initialize failed");
+    // 初始化
+    if ((shmid = shmGet(g_app_id+2)) < 0) {/*{{{*/
         goto ExitError;
     }
-    puts("SHMMsgQueue initialize OK");/*}}}*/
+    printf("SHMID: %d\n", shmid);
+    if ((addr = shmAt(shmid)) < 0) {
+        goto ExitError;
+    }
+    printf("SHMADDR: %p\n", addr);
+    if (shm_stoc_q.setQueueAddr(addr) < 0) {
+        goto ExitError;
+    }
+
+    if ((shmid = shmGet(g_app_id+1)) < 0) {
+        goto ExitError;
+    }
+    printf("SHMID: %d\n", shmid);
+    if ((addr = shmAt(shmid)) < 0) {
+        goto ExitError;
+    }
+    printf("SHMADDR: %p\n", addr);
+    if (shm_ctos_q.setQueueAddr(addr) < 0) {
+        goto ExitError;
+    }
+    puts("SHM initialize OK");/*}}}*/
 
     while (g_count > 0) {/*{{{*/
-        printf("SHMMsgQueue size: %u\n", shm_stoc_q.size());
-        while (shm_stoc_q.size() > 0) {
-            SHMMsg& msg = shm_stoc_q.front();
+        if (shm_stoc_q.size() > 0) {
+            printf("SHMQ:");
+            printf(" head[%04u]", shm_stoc_q.head());
+            printf(" tail[%04u]", shm_stoc_q.tail());
+            printf(" size[%04u]", shm_stoc_q.size());
+            DataUnit& msg = shm_stoc_q.front();
+            printf(" addr[%p]", (void*)&msg);
             if (shm_stoc_q.pop() < 0) {
-                printf("SHMMsgQueue pop failed ");
-                continue;
+                printf(" pop failed ");
             } else {
-                printf("SHMMsgQueue pop OK ");
+                printf(" pop   OK   ");
             }
-            cout << "head: " << shm_stoc_q.head()
-                << " tail: " << shm_stoc_q.tail()
-                << " size: " << shm_stoc_q.size()
-                << endl;
-            snprintf("SHMCli read ipc msg [%s]\n", msg.len_, (char*)msg.data_);
+            printf("===> %d:[%s] <===\n", msg.len, (char*)msg.data);
         }
-        sleep(1);
+
+        usleep(300000);
     }/*}}}*/
 
     result = 0;
 ExitError:
-    // 释放 SHMMsgQueue
-    if ((S_SUCCESS != shm_stoc_q.release()) ||/*{{{*/
-       ((S_SUCCESS != shm_ctos_q.release()))) {
-        puts("SHMMsgQueue release failed");
-        goto ExitError;
-    }
-    puts("SHMMsgQueue release OK");/*}}}*/
-
     if (0 == result) {/*{{{*/
         puts("program exit OK");
     } else {

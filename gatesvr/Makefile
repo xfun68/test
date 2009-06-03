@@ -39,8 +39,7 @@ DEBUG          	:= YES
 PROGRAM_NAME    := gatesvr
 
 # ------------  list of all source files  --------------------------------------
-SOURCES         := gatesvr.cpp \
-		shm_msg_queue.cpp
+SOURCES         := gatesvr.cpp
 
 # ------------  other name of the target  ----------------------------------------
 ifeq (YES,${LIB})
