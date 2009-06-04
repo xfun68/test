@@ -28,8 +28,8 @@
 # ------------  name of the target  ----------------------------------------
 PROGRAM_NAME    := test
 
-# ------------  list of all source files  --------------------------------------
-SOURCES         := main.cpp
+# DEBUG can be set to YES to include debugging info, or NO otherwise
+DEBUG          	:= YES
 
 # LIB can be set to YES to build a library not a executable program, or no otherwise
 LIB        		  := NO
@@ -38,8 +38,8 @@ VER_NUM         := 1
 MINOR_NUM       := 1
 RELEASE_NUM     := `date +%Y%m%d`
 
-# DEBUG can be set to YES to include debugging info, or NO otherwise
-DEBUG          	:= YES
+# ------------  list of all source files  --------------------------------------
+SOURCES         := main.cpp
 
 # ------------  other name of the target  ----------------------------------------
 ifeq (YES,${LIB})
