@@ -16,7 +16,7 @@
 /*}}}*/
 #include "event_handler.h"
 #include "connection_manager.h"
-#include "../test/tool/tool.h"
+#include "tool.h"
 
 #include <signal.h>
 #include <stdlib.h>

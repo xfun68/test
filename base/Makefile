@@ -25,6 +25,9 @@
 #               section 4.13). The utility sed is used.
 #========================================== makefile template version 1.8 ====== }}}
 
+# ------------  name of the target  ----------------------------------------
+PROGRAM_NAME    := base
+
 # DEBUG can be set to YES to include debugging info, or NO otherwise
 DEBUG          	:= YES
 
@@ -33,29 +36,9 @@ LIB        		  := YES
 LIB_STYLE      	:= STATIC
 VER_NUM         := 1
 MINOR_NUM       := 1
-RELEASE_NUM     := 090524
-
-# PROFILE can be set to yes to include profiling info, or no otherwise
-PROFILE        	:= NO
-
-# ------------  name of the target  ----------------------------------------
-PROGRAM_NAME    := base
-
-ifeq (YES,${LIB})
-ifeq (SHARE, ${LIB_STYLE})
-  LINKER_NAME   := lib${PROGRAM_NAME}.so
-  SONAME        := ${LINKER_NAME}.${VER_NUM}
-  REAL_NAME     := ${SONAME}.${MINOR_NUM}.${RELEASE_NUM}
-else
-  LINKER_NAME   := lib${PROGRAM_NAME}.a
-  REAL_NAME     := ${LINKER_NAME}.${MINOR_NUM}.${RELEASE_NUM}
-endif
-else
-  REAL_NAME     := ${PROGRAM_NAME}
-endif
+RELEASE_NUM     := `date +%Y%m%d`
 
 # ------------  list of all source files  --------------------------------------
-ifeq (YES,${LIB})
 SOURCES         := connection.cpp \
 		connection_manager.cpp \
 		event_handler.cpp \
@@ -64,16 +47,31 @@ SOURCES         := connection.cpp \
 		app_buffer.cpp \
 		shm.cpp \
 		tool.cpp
+
+# ------------  other name of the target  ----------------------------------------
+ifeq (YES,${LIB})
+ifeq (SHARE, ${LIB_STYLE})
+ifeq (YES, ${DEBUG})
+  LINKER_NAME   := lib${PROGRAM_NAME}d.so
 else
-SOURCES         := connection.cpp \
-		connection_manager.cpp \
-		event_handler.cpp \
-		sockaddr_in.cpp \
-		sockfd.cpp \
-		app_buffer.cpp \
-		tool.cpp \
-		shm.cpp \
-		main.cpp
+  LINKER_NAME   := lib${PROGRAM_NAME}.so
+endif
+  SONAME        := ${LINKER_NAME}.${VER_NUM}
+  REAL_NAME     := ${SONAME}.${MINOR_NUM}.${RELEASE_NUM}
+else
+ifeq (YES, ${DEBUG})
+  LINKER_NAME   := lib${PROGRAM_NAME}d.a
+else
+  LINKER_NAME   := lib${PROGRAM_NAME}.a
+endif
+  REAL_NAME     := ${LINKER_NAME}.${VER_NUM}.${MINOR_NUM}.${RELEASE_NUM}
+endif
+else
+ifeq (YES, ${DEBUG})
+  REAL_NAME     := ${PROGRAM_NAME}d
+else
+  REAL_NAME     := ${PROGRAM_NAME}
+endif
 endif
 
 # ------------  tools  ---------------------------------------------------------
@@ -115,6 +113,9 @@ else
   LDFLAGS      := ${RELEASE_LDFLAGS}
 endif
 
+# PROFILE can be set to yes to include profiling info, or no otherwise
+PROFILE        	:= NO
+
 ifeq (YES, ${PROFILE})
   CFLAGS       := ${CFLAGS}   -pg -O3
   CXXFLAGS     := ${CXXFLAGS} -pg -O3
@@ -128,7 +129,8 @@ GLOBAL_INC_DIR  =
 LOCAL_INC_DIR   =
 
 # ------------  system libraries  (e.g. -lm )  ---------------------------------
-SYS_LIBS        = -lm -lc -lpthread
+SYS_LIBS        = m \
+									c
 
 # ------------  additional system library directories  -------------------------
 GLOBAL_LIB_DIR  =
@@ -159,8 +161,15 @@ C_SOURCES       = $(filter     %.c, $(SOURCES))
 CPP_SOURCES     = $(filter-out %.c, $(SOURCES))
 ALL_INC_DIR     = $(addprefix -I, $(LOCAL_INC_DIR) $(GLOBAL_INC_DIR))
 ALL_LIB_DIR     = $(addprefix -L, $(LOCAL_LIB_DIR) $(GLOBAL_LIB_DIR))
-GLOBAL_LIBSS    = $(addprefix $(GLOBAL_LIB_DIR)/, $(GLOBAL_LIBS))
-LOCAL_LIBSS     = $(addprefix $(LOCAL_LIB_DIR)/, $(LOCAL_LIBS))
+SYS_LIBSS    		= $(addprefix -l, $(SYS_LIBS))
+ifeq (YES, ${DEBUG})
+		GLOBAL_LIBS     := $(addsuffix d, $(GLOBAL_LIBS))
+endif
+GLOBAL_LIBSS    = $(addprefix -l, $(GLOBAL_LIBS))
+ifeq (YES, ${DEBUG})
+		LOCAL_LIBS      := $(addsuffix d, $(LOCAL_LIBS))
+endif
+LOCAL_LIBSS     = $(addprefix -l, $(LOCAL_LIBS))
 ALL_CFLAGS      = $(CFLAGS) $(ALL_INC_DIR)
 ALL_LFLAGS      = $(LDFLAGS) $(ALL_LIB_DIR)
 BASENAMES       = $(basename $(SOURCES))
@@ -169,7 +178,7 @@ BASENAMES       = $(basename $(SOURCES))
 OBJECTS         = $(addsuffix .o,$(BASENAMES))
 
 # ------------  generate the names of the hidden prerequisite files  -----------
-PREREQUISITES   = $(addprefix .,$(addsuffix .d,$(BASENAMES)))
+#PREREQUISITES   = $(addprefix .,$(addsuffix .d,$(BASENAMES)))
 
 # ------------  make goal  ------------------------------------------------
 all:	$(REAL_NAME)
@@ -178,18 +187,19 @@ $(REAL_NAME):	$(OBJECTS)
 ifeq (YES, ${LIB})
 ifeq (SHARE, ${LIB_STYLE})
 ifeq ($(strip $(CPP_SOURCES)),)
-				$(CC)  $(ALL_LFLAGS) -o $(REAL_NAME) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBS)
+				$(CC)  $(ALL_LFLAGS) -o $(REAL_NAME) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBSS)
 else
-				$(CXX) $(ALL_LFLAGS) -o $(REAL_NAME) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBS)
+				$(CXX) $(ALL_LFLAGS) -o $(REAL_NAME) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBSS)
 endif
 else
 				$(AR) $(REAL_NAME) $(OBJECTS)
 endif
+				ln -sf $(REAL_NAME) $(LINKER_NAME)
 else
 ifeq ($(strip $(CPP_SOURCES)),)
-				$(CC)  $(ALL_LFLAGS) -o $(REAL_NAME) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBS)
+				$(CC)  $(ALL_LFLAGS) -o $(REAL_NAME) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBSS)
 else
-				$(CXX) $(ALL_LFLAGS) -o $(REAL_NAME) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBS)
+				$(CXX) $(ALL_LFLAGS) -o $(REAL_NAME) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBSS)
 endif
 endif
 
@@ -272,8 +282,10 @@ endif
 
 # ------------  remove generated files  ----------------------------------------
 # ------------  remove hidden backup files  ------------------------------------
+#-rm  --force  $(REAL_NAME) $(OBJECTS) $(PREREQUISITES) *~
 clean:
 								-rm  --force  $(REAL_NAME) $(OBJECTS) *~
+
 
 # ------------ tarball generation ----------------------------------------------
 tarball:

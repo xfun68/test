@@ -93,15 +93,15 @@ ExitError:
     }
 
     int32_t release(void) {
-        int32_t result = E_ERROR;
+        int32_t result = -1;
 
         // ÊÍ·Å×ÊÔ´
         if (S_SUCCESS != cm_.release()) {/*{{{*/
             puts("ConnectionManager release failed");
-            result = -1;
         }
         puts("ConnectionManager release OK");/*}}}*/
 
+        result = 0;
         return result;
     }
 
@@ -169,6 +169,9 @@ ExitError:
         bzero(msg.data, DATA_LEN);
         conn->read((void*)&msg.data, DATA_LEN, msg.len);
         msg.data[DATA_LEN-1] = 0;
+        if (msg.len <= 0) {
+            return 0;
+        }
 
         retcode = shm_stoc_q.push(msg);
         printf("SHMQ:");
@@ -230,7 +233,7 @@ int main (int argc, char *argv[])
     result = 0;
 ExitError:
 
-    if (S_SUCCESS != (retcode = gateSvr.release())) {
+    if ((retcode = gateSvr.release()) < 0) {
         printf("GateSvr release failed with error [%d]\n",
             retcode);
     }
