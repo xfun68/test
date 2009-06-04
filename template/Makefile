@@ -44,15 +44,27 @@ DEBUG          	:= YES
 # ------------  other name of the target  ----------------------------------------
 ifeq (YES,${LIB})
 ifeq (SHARE, ${LIB_STYLE})
+ifeq (YES, ${DEBUG})
+  LINKER_NAME   := lib${PROGRAM_NAME}d.so
+else
   LINKER_NAME   := lib${PROGRAM_NAME}.so
+endif
   SONAME        := ${LINKER_NAME}.${VER_NUM}
   REAL_NAME     := ${SONAME}.${MINOR_NUM}.${RELEASE_NUM}
 else
+ifeq (YES, ${DEBUG})
+  LINKER_NAME   := lib${PROGRAM_NAME}d.a
+else
   LINKER_NAME   := lib${PROGRAM_NAME}.a
-  REAL_NAME     := ${LINKER_NAME}
+endif
+  REAL_NAME     := ${LINKER_NAME}.${VER_NUM}.${MINOR_NUM}.${RELEASE_NUM}
 endif
 else
+ifeq (YES, ${DEBUG})
+  REAL_NAME     := ${PROGRAM_NAME}d
+else
   REAL_NAME     := ${PROGRAM_NAME}
+endif
 endif
 
 # ------------  tools  ---------------------------------------------------------
@@ -64,8 +76,8 @@ INSTALL_LIB 		:= ${INSTALL} -m 755
 INSTALL_PROGRAM := ${INSTALL} -m 755
 
 # ------------  compiler flags  ------------------------------------------------
-DEBUG_CFLAGS      := -DLINUX -Wall -ansi -pedantic -O0 -g
-DEBUG_CXXFLAGS    := -DLINUX -Wall -ansi -pedantic -O0 -g
+DEBUG_CFLAGS      := -DLINUX -DDEBUG_TRACE -Wall -ansi -pedantic -O0 -g
+DEBUG_CXXFLAGS    := -DLINUX -DDEBUG_TRACE -Wall -ansi -pedantic -O0 -g
 RELEASE_CFLAGS    := -DLINUX -Wall -ansi -pedantic -O3
 RELEASE_CXXFLAGS  := -DLINUX -Wall -ansi -pedantic -O3
 
@@ -144,6 +156,9 @@ ALL_INC_DIR     = $(addprefix -I, $(LOCAL_INC_DIR) $(GLOBAL_INC_DIR))
 ALL_LIB_DIR     = $(addprefix -L, $(LOCAL_LIB_DIR) $(GLOBAL_LIB_DIR))
 SYS_LIBSS    		= $(addprefix -l, $(SYS_LIBS))
 GLOBAL_LIBSS    = $(addprefix -l, $(GLOBAL_LIBS))
+ifeq (YES, ${DEBUG})
+GLOBAL_LIBSS    = $(addsuffix d, $(GLOBAL_LIBS))
+endif
 LOCAL_LIBSS     = $(addprefix -l, $(LOCAL_LIBS))
 ALL_CFLAGS      = $(CFLAGS) $(ALL_INC_DIR)
 ALL_LFLAGS      = $(LDFLAGS) $(ALL_LIB_DIR)
@@ -169,6 +184,7 @@ endif
 else
 				$(AR) $(REAL_NAME) $(OBJECTS)
 endif
+				ln -sf $(REAL_NAME) $(LINKER_NAME)
 else
 ifeq ($(strip $(CPP_SOURCES)),)
 				$(CC)  $(ALL_LFLAGS) -o $(REAL_NAME) $(OBJECTS) $(LOCAL_LIBSS) $(GLOBAL_LIBSS) $(SYS_LIBSS)
