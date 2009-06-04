@@ -155,9 +155,12 @@ CPP_SOURCES     = $(filter-out %.c, $(SOURCES))
 ALL_INC_DIR     = $(addprefix -I, $(LOCAL_INC_DIR) $(GLOBAL_INC_DIR))
 ALL_LIB_DIR     = $(addprefix -L, $(LOCAL_LIB_DIR) $(GLOBAL_LIB_DIR))
 SYS_LIBSS    		= $(addprefix -l, $(SYS_LIBS))
+ifeq (YES, ${DEBUG})
+		GLOBAL_LIBS     := $(addsuffix d, $(GLOBAL_LIBS))
+endif
 GLOBAL_LIBSS    = $(addprefix -l, $(GLOBAL_LIBS))
 ifeq (YES, ${DEBUG})
-GLOBAL_LIBSS    = $(addsuffix d, $(GLOBAL_LIBS))
+		LOCAL_LIBS      := $(addsuffix d, $(LOCAL_LIBS))
 endif
 LOCAL_LIBSS     = $(addprefix -l, $(LOCAL_LIBS))
 ALL_CFLAGS      = $(CFLAGS) $(ALL_INC_DIR)
