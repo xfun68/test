@@ -28,7 +28,7 @@ alias remake='make clean && make;'
 alias egrep='grep -E -a -i --color'
 
 # erating 所有进程
-alias erating_processes='echo "((USER|UID|PID).*(CMD|COMMAND))|rating|gatesvr|cli|ausvr|chargesvr|paysvr|logsvr|monitsvr"'
+alias erating_processes='echo "((USER|UID|PID).*(CMD|COMMAND))|rating|ausvr|chargesvr|paysvr|logsvr|monitsvr"'
 
 # dev 开发时使用的所有进程
 alias dev_processes='echo "((USER|UID|PID).*(CMD|COMMAND))|./gatesvr|./ipccli|./tcpcli"'
@@ -37,17 +37,17 @@ alias dev_processes='echo "((USER|UID|PID).*(CMD|COMMAND))|./gatesvr|./ipccli|./
 ## pp 进程
 ## ph 进程
 ## pl 线程
-alias pp='ps xukuser,comm | egrep -v "grep|ps xuk" | egrep `erating_processes`'
-alias ph='ps -ejFH --sort=cmd | egrep -v "grep |ps -ejF" | egrep `erating_processes`'
-alias pl='ps -ejFL --sort=cmd | egrep -v "grep |ps -ejF" | egrep `erating_processes`'
+alias pp='ps xukuser,comm | egrep -v "grep|ps xuk|vim" | egrep `erating_processes`'
+alias ph='ps -ejFH --sort=cmd | egrep -v "grep |ps -ejF|vim" | egrep `erating_processes`'
+alias pl='ps -ejFL --sort=cmd | egrep -v "grep |ps -ejF|vim" | egrep `erating_processes`'
 
 # 查看 dev 所有进程状态
 ## ppd 进程
 ## phd 进程
 ## pld 线程
-alias ppd='ps xukuser,comm | egrep -v "grep|ps xuk" | egrep `dev_processes`'
-alias phd='ps -ejFH --sort=cmd | egrep -v "grep |ps -ejF" | egrep `dev_processes`'
-alias pld='ps -ejFL --sort=cmd | egrep -v "grep |ps -ejF" | egrep `dev_processes`'
+alias ppd='ps xukuser,comm | egrep -v "grep|ps xuk|vim" | egrep `dev_processes`'
+alias phd='ps -ejFH --sort=cmd | egrep -v "grep |ps -ejF|vim" | egrep `dev_processes`'
+alias pld='ps -ejFL --sort=cmd | egrep -v "grep |ps -ejF|vim" | egrep `dev_processes`'
 
 # 查看运行环境状态
 ## 共享内存
