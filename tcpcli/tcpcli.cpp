@@ -54,10 +54,11 @@ public:
             printf("create connection OK\n");
             conn_->set_event_handler(this);
             conn_->connect();
+            printf("connect %s %u\n", conn_->string_ip(), conn_->port());
         } else if (conn_->state() != Connection::ESTABLISHED) {
             conn_->connect();
+            printf("connect %s %u\n", conn_->string_ip(), conn_->port());
         }
-        printf("connect %s %u\n", conn_->string_ip(), conn_->port());
         return S_SUCCESS;
     }/*}}}*/
 
@@ -68,7 +69,7 @@ public:
 
         snprintf((char*)buf, BUF_SIZE, "cli count: %u", ++count_);
         conn->write(buf, strlen((char*)buf), sent_bytes);
-        printf("cli write %d bytes data [%s]\n", sent_bytes, buf);
+        printf("<--- %d:[%s]\n", sent_bytes, buf);
         return S_SUCCESS;
     }/*}}}*/
 

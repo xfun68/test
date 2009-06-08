@@ -18,8 +18,7 @@
 #include "event_handler.h"
 #include "connection_manager.h"
 #include "tool.h"
-#include "loop_queue.h"
-#include "shm.h"
+#include "shmq.h"
 
 #include <signal.h>
 #include <stdlib.h>
@@ -45,10 +44,8 @@ int main (int argc, char *argv[])
 {
     // 声明
     int32_t result = -1;
-    int32_t shmid = -1;
-    void* addr = NULL;
-    LoopQueue<DataUnit> shm_stoc_q;
-    LoopQueue<DataUnit> shm_ctos_q;
+    SHMQ<DataUnit> shm_stoc_q;
+    SHMQ<DataUnit> shm_ctos_q;
 
     // 进程唯一约束、设置信号处理函数
     instanceRestrict(argv[0]);/*{{{*/
@@ -58,45 +55,28 @@ int main (int argc, char *argv[])
     signal(SIGTERM, sigExit);/*}}}*/
 
     // 初始化
-    if ((shmid = shmGet(g_app_id+2)) < 0) {/*{{{*/
-        goto ExitError;
-    }
-    printf("SHMID: %d\n", shmid);
-    if ((addr = shmAt(shmid)) < 0) {
-        goto ExitError;
-    }
-    printf("SHMADDR: %p\n", addr);
-    if (shm_stoc_q.setQueueAddr(addr) < 0) {
+    if (shm_stoc_q.initialize(0x10, 0x20, 1024, false) < 0) {
         goto ExitError;
     }
 
-    if ((shmid = shmGet(g_app_id+1)) < 0) {
+    if (shm_ctos_q.initialize(0x20, 0x10, 16, true) < 0) {
         goto ExitError;
     }
-    printf("SHMID: %d\n", shmid);
-    if ((addr = shmAt(shmid)) < 0) {
-        goto ExitError;
-    }
-    printf("SHMADDR: %p\n", addr);
-    if (shm_ctos_q.setQueueAddr(addr) < 0) {
-        goto ExitError;
-    }
-    puts("SHM initialize OK");/*}}}*/
 
     while (g_count > 0) {/*{{{*/
-        if (shm_stoc_q.size() > 0) {
+        if (shm_stoc_q.queue().size() > 0) {
             printf("SHMQ:");
-            printf(" head[%04u]", shm_stoc_q.head());
-            printf(" tail[%04u]", shm_stoc_q.tail());
-            printf(" size[%04u]", shm_stoc_q.size());
-            DataUnit& msg = shm_stoc_q.front();
+            printf(" head[%04u]", shm_stoc_q.queue().head());
+            printf(" tail[%04u]", shm_stoc_q.queue().tail());
+            printf(" size[%04u]", shm_stoc_q.queue().size());
+            DataUnit& msg = shm_stoc_q.queue().front();
             printf(" addr[%p]", (void*)&msg);
-            if (shm_stoc_q.pop() < 0) {
+            if (shm_stoc_q.queue().pop() < 0) {
                 printf(" pop failed ");
             } else {
                 printf(" pop   OK   ");
             }
-            printf("===> %d:[%s] <===\n", msg.len, (char*)msg.data);
+            printf("---> %d:[%s]\n", msg.len, (char*)msg.data);
         }
 
         usleep(300000);
@@ -104,6 +84,16 @@ int main (int argc, char *argv[])
 
     result = 0;
 ExitError:
+    if (0 != shm_stoc_q.release()) {/*{{{*/
+        puts("shm_stoc_q release failed");
+    }
+    puts("shm_stoc_q release OK");/*}}}*/
+
+    if (0 != shm_ctos_q.release()) {/*{{{*/
+        puts("shm_ctos_q release failed");
+    }
+    puts("shm_ctos_q release OK");/*}}}*/
+
     if (0 == result) {/*{{{*/
         puts("program exit OK");
     } else {

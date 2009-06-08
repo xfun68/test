@@ -46,6 +46,7 @@ SOURCES         := connection.cpp \
 		sockfd.cpp \
 		app_buffer.cpp \
 		shm.cpp \
+		shmq.cpp \
 		tool.cpp
 
 # ------------  other name of the target  ----------------------------------------

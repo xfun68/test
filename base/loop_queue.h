@@ -1,6 +1,7 @@
 #ifndef _LOOP_QUEUE_H_
 #define _LOOP_QUEUE_H_
 
+#include <cstdio>
 #include <inttypes.h>
 
 template <typename T>

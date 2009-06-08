@@ -17,18 +17,19 @@
 #ifndef _TOOL_H_
 #define _TOOL_H_
 
+#include <string.h>
 #include <time.h>
 #include <errno.h>
 #include <pthread.h>
 #include <inttypes.h>
 
-#define ASSURE_SUCCESS(RESULT, RETCODE, STATEMENT) \
+#define ASSURE_SUCCESS(RESULT, RETCODE, STATEMENT); \
     if (S_SUCCESS != (RETCODE = (STATEMENT))) {\
         RESULT = RETCODE;\
         goto ExitError;\
     }
 
-#define PUT_ERR(TAG) \
+#define PUT_ERR(TAG); \
     printf("%s: [%d] %s\n", TAG, errno, strerror(errno));
 
 /*
