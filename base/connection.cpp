@@ -150,6 +150,10 @@ int32_t Connection::recv(void)
     int8_t buffer[BUF_SIZE];
     int32_t bytes = 0;
 
+    if (recv_buf_.freeSize() < bytes) {
+        goto ExitError;
+    }
+
 RE_RECV:
     if (ESTABLISHED != state()) {
         result = E_NOT_CONN;
@@ -171,9 +175,7 @@ RE_RECV:
         result = E_ERROR;
         goto ExitError;
     }
-    if (recv_buf_.freeSize() >= bytes) {
-        recv_buf_.write(buffer, bytes);
-    }
+    recv_buf_.write(buffer, bytes);
 
     result = S_SUCCESS;
 ExitError:
