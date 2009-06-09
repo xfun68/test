@@ -66,7 +66,7 @@ AppBuffer::~AppBuffer(void)
 // options
 int32_t AppBuffer::peek(void* buf, int32_t size)
 {
-    int32_t result = E_ERROR;
+    int32_t result = -1;
     int32_t min_size = 0;
     int32_t head = 0;
     int32_t tail = 0;
@@ -114,7 +114,7 @@ int32_t AppBuffer::seek(int32_t size)
 
 int32_t AppBuffer::read(void* buf, int32_t size)
 {
-    int32_t result = E_ERROR;
+    int32_t result = -1;
     if ((result = peek(buf, size)) > 0) {
         head_ += result;
         if (head_ == tail_) {
@@ -126,17 +126,18 @@ int32_t AppBuffer::read(void* buf, int32_t size)
 
 int32_t AppBuffer::peekUInt16(uint16_t& value)
 {
-    int32_t result = E_ERROR;
-    value = 0;
+    int32_t result = -1;
     if ((result = peek(&value, sizeof(value))) > 0) {
         value = ntohs(value);
+    } else {
+        value = 0;
     }
     return result;
 }
 
 int32_t AppBuffer::write(const void* buf, int32_t size)
 {
-    int32_t result = E_ERROR;
+    int32_t result = -1;
     int32_t head = 0;
     int32_t tail = 0;
     int8_t* src_buf = NULL;
