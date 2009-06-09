@@ -91,9 +91,9 @@ int32_t Sockfd::initialize(void)
 
     if (sockfd > 0) {
         sockfd_ = sockfd;
-        if ((0 == setNonBlocking()) &&
-            (0 == setReuseAddr()) &&
-            (0 == setLinger())) {
+        if ((0 == setReuseAddr()) &&
+            // (0 == setLinger()) &&
+            (0 == setNonBlocking())) {
             return S_SUCCESS;
         } else {
             sockfd_ = 0;
@@ -109,9 +109,9 @@ int32_t Sockfd::initialize(in_addr_t sockfd)
     release();
     if (sockfd > 2) {
         sockfd_ = sockfd;
-        if ((0 == setNonBlocking()) &&
-            (0 == setReuseAddr()) &&
-            (0 == setLinger())) {
+        if ((0 == setReuseAddr()) &&
+            // (0 == setLinger()) &&
+            (0 == setNonBlocking())) {
             return S_SUCCESS;
         } else {
             sockfd_ = 0;
