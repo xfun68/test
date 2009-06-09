@@ -28,12 +28,6 @@
 using namespace std;
 
 int32_t g_count = 100;
-uint8_t g_app_id = 0x10;
-const int32_t DATA_LEN = 64;
-struct DataUnit {
-    int32_t len;
-    int8_t data[DATA_LEN];
-};
 
 void sigExit(int signo) {/*{{{*/
     g_count = 0;
@@ -44,6 +38,7 @@ int main (int argc, char *argv[])
 {
     // 声明
     int32_t result = -1;
+    int32_t retcode = -1;
     SHMQ<DataUnit> shm_stoc_q;
     SHMQ<DataUnit> shm_ctos_q;
 
@@ -63,24 +58,47 @@ int main (int argc, char *argv[])
         goto ExitError;
     }
 
-    while (g_count > 0) {/*{{{*/
-        if (shm_stoc_q.queue().size() > 0) {
-            printf("SHMQ:");
-            printf(" head[%04u]", shm_stoc_q.queue().head());
-            printf(" tail[%04u]", shm_stoc_q.queue().tail());
-            printf(" size[%04u]", shm_stoc_q.queue().size());
-            DataUnit& msg = shm_stoc_q.queue().front();
-            printf(" addr[%p]", (void*)&msg);
-            if (shm_stoc_q.queue().pop() < 0) {
-                printf(" pop failed ");
-            } else {
-                printf(" pop   OK   ");
+    while (g_count > 0) {
+        {   // stoc 队列读消息/*{{{*/
+            while (shm_stoc_q.queue().size() > 0) {
+                printf("SHMQ-input :");
+                printf(" head[%04u]", shm_stoc_q.queue().head());
+                printf(" tail[%04u]", shm_stoc_q.queue().tail());
+                printf(" size[%04u]", shm_stoc_q.queue().size());
+                DataUnit& msg = shm_stoc_q.queue().front();
+                if (shm_stoc_q.queue().pop() < 0) {
+                    printf(" pop  failed ");
+                } else {
+                    printf(" pop    OK   ");
+                }
+                printf("---> %04d:[%s]\n", msg.len, (char*)msg.data);
             }
-            printf("---> %d:[%s]\n", msg.len, (char*)msg.data);
         }
 
-        usleep(300000);
-    }/*}}}*/
+        {
+            // ctos 队列写消息
+            static int32_t count = 0;
+            const int32_t BUF_SIZE = 64;
+            DataUnit& msg = shm_ctos_q.queue().end();
+
+            snprintf((char*)msg.data, BUF_SIZE, "ipccli count: %04u", ++count);
+            msg.len = strlen((char*)msg.data);
+
+            retcode = shm_ctos_q.queue().push(msg);
+            printf("SHMQ-output:");
+            printf(" head[%04u]", shm_ctos_q.queue().head());
+            printf(" tail[%04u]", shm_ctos_q.queue().tail());
+            printf(" size[%04u]", shm_ctos_q.queue().size());
+            if (retcode < 0) {
+                printf("%s", " push failed ");
+            } else {
+                printf("%s", " push   OK   ");
+            }
+            printf("<--- %04d:[%s]\n", msg.len, (char*)msg.data);
+        }/*}}}*/
+
+        sleep(1);
+    }
 
     result = 0;
 ExitError:

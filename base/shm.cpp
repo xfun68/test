@@ -9,7 +9,7 @@ int32_t shmCreate(key_t key, size_t size, int32_t shmflg)
     if (key < 0xff) {
         key = ftok(getenv("PWD"), key);
     }
-    printf("[key=0x%08X]\n", (uint32_t)key);
+    printf("#[key=0x%08X]\n", (uint32_t)key);
     if ((shmid = shmget(key, size, shmflg)) < 0) {
         PUT_ERR("shmCreate");
     }
@@ -22,7 +22,7 @@ int32_t shmGet(key_t key, int32_t shmflg)
     if (key < 0xff) {
         key = ftok(getenv("PWD"), key);
     }
-    printf("[key=0x%08X]\n", (uint32_t)key);
+    printf("#[key=0x%08X]\n", (uint32_t)key);
     if ((shmid = shmget(key, 0, shmflg)) < 0) {
         PUT_ERR("shmGet");
     }

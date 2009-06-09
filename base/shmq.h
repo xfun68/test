@@ -19,6 +19,13 @@
 
 #include "shm.h"
 #include "loop_queue.h"
+#include <stdlib.h>
+
+const int32_t MAX_DATA_LEN = 1024;
+struct DataUnit {
+    int32_t len;
+    int8_t data[MAX_DATA_LEN];
+};
 
 struct SHMState
 {
@@ -75,18 +82,16 @@ public:
             shmid = shmGet(from_app_id | (to_app_id >> 4));
         }
         if (shmid < 0) {
-            PUT_ERR("SHMQ::initialize::shmCreate/shmGet");
+            PUT_ERR("#[SHMQ::initialize::shmCreate/shmGet]");
             result = 0;
             goto ExitError;
         }
-        printf("SHMID: %d\n", shmid);
 
         if ((addr = shmAt(shmid)) < 0) {
-            PUT_ERR("SHMQ::initialize::shmAt");
+            PUT_ERR("#[SHMQ::initialize::shmAt]");
             result = 0;
             goto ExitError;
         }
-        printf("SHMADDR: %p\n", addr);
 
         shmid_ = shmid;
         state_ = (SHMState*)addr;
@@ -99,7 +104,7 @@ public:
         if (queue_.setQueueAddr((int8_t*)addr+sizeof(SHMState),
                 state_->elem_len_,
                 state_->size_) < 0) {
-            PUT_ERR("SHMQ::initialize::setQueueAddr");
+            PUT_ERR("#[SHMQ::initialize::setQueueAddr]");
             result = 0;
             goto ExitError;
         }
@@ -123,20 +128,23 @@ ExitError:
             goto ExitOK;
         }
 
-        printf("release shmid %d\n", shmid_);
-        state_->be_dest_ = 1;
-        queue_.setQueueAddr(NULL);
-        shmDt(state_);
+        printf("#[release key=0x%08x shmid=%d]\n",
+            ftok(getenv("PWD"), from_app_id_ | (to_app_id_ >> 4)),
+            shmid_);
+
         if (be_output_queue_) {
+            state_->be_dest_ = 1;
             shmDestroy(shmid_);
         }
+        shmDt(state_);
+        queue_.setQueueAddr(NULL);
 
-        /*
+        /*{{{
         from_app_id_ = 0;
         to_app_id_ = 0;
         size_ = 0;
         be_output_queue_ = true;
-        */
+        }}}*/
         state_ = NULL;
         shmid_ = -1;
 ExitOK:
@@ -146,7 +154,6 @@ ExitOK:
     LoopQueue<T>& queue(void)
     {
         if (!isValid()) {
-            printf("shm has been invalid, release and re-initialize\n");
             release();
             initialize();
         }

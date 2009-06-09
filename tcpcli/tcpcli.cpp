@@ -18,6 +18,7 @@
 #include "event_handler.h"
 #include "connection_manager.h"
 #include "tool.h"
+#include "shmq.h"
 
 #include <signal.h>
 #include <stdlib.h>
@@ -35,7 +36,7 @@ void sigExit(int signo) {/*{{{*/
 }/*}}}*/
 
 class CliHandler : public EventHandler
-{/*{{{*/
+{
 public:
     CliHandler(std::string name) :
         EventHandler(name),/*{{{*/
@@ -63,15 +64,36 @@ public:
     }/*}}}*/
 
     int32_t onWrite(Connection* conn) {
-        const int32_t BUF_SIZE = 64;/*{{{*/
-        int32_t sent_bytes = 0;
-        int8_t buf[BUF_SIZE] = {0};
+        static uint32_t tick = 0;
 
-        snprintf((char*)buf, BUF_SIZE, "cli count: %u", ++count_);
-        conn->write(buf, strlen((char*)buf), sent_bytes);
-        printf("<--- %d:[%s]\n", sent_bytes, buf);
+        if (time(NULL) - tick >= 1) {
+            const int32_t BUF_SIZE = 64;
+            int32_t sent_bytes = 0;
+            int8_t buf[BUF_SIZE] = {0};
+
+            tick = time(NULL);
+
+            snprintf((char*)buf, BUF_SIZE, "tcpcli count: %u", ++count_);
+            conn->write(buf, strlen((char*)buf), sent_bytes);
+            printf("<--- %d:[%s]\n", sent_bytes, buf);
+        }
+
         return S_SUCCESS;
-    }/*}}}*/
+    }
+
+    int32_t onRead(Connection* conn) {
+        DataUnit msg;
+
+        conn->read((void*)&msg.data, MAX_DATA_LEN, msg.len);
+        if (msg.len <= 0) {
+            goto ExitOK;
+        }
+        msg.data[msg.len] = 0;
+        printf("---> %d:[%s]\n", msg.len, (char*)msg.data);
+
+ExitOK:
+        return 0;
+    }
 
     int32_t onRelease(Connection* conn) {
         EventHandler::onRelease(conn);
@@ -83,7 +105,7 @@ public:
 private:
     uint32_t count_;
     Connection* conn_;
-};/*}}}*/
+};
 
 int main (int argc, char *argv[])
 {/*{{{*/
