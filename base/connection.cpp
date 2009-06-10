@@ -20,6 +20,8 @@ namespace socketor
 
 Connection::Connection(void) :
     init_ok_(0),
+    last_recv_time_(0),
+    last_send_time_(0),
     auto_release_(0),
     state_(CLOSED),
     default_event_handler_("ConnDefHandler"),
@@ -36,6 +38,8 @@ Connection::Connection(
     uint16_t port,
     EventHandler* event_handler) :
     init_ok_(0),
+    last_recv_time_(0),
+    last_send_time_(0),
     auto_release_(0),
     state_(CLOSED),
     default_event_handler_("ConnDefHandler"),
@@ -57,6 +61,8 @@ Connection::Connection(
     uint16_t port,
     EventHandler* event_handler) :
     init_ok_(0),
+    last_recv_time_(0),
+    last_send_time_(0),
     auto_release_(0),
     state_(CLOSED),
     default_event_handler_("ConnDefHandler"),
@@ -177,6 +183,7 @@ RE_RECV:
     }
     recv_buf_.write(buffer, bytes);
 
+    last_recv_time_ = time(NULL);
     result = S_SUCCESS;
 ExitError:
     return result;
@@ -213,6 +220,7 @@ RE_SEND:
     }
     send_buf_.seek(bytes);
 
+    last_send_time_ = time(NULL);
 ExitOK:
     result = S_SUCCESS;
 ExitError:
@@ -233,6 +241,8 @@ int32_t Connection::release(void)
     }
     sockfd_.release();
     init_ok_ = E_ERROR;
+    last_recv_time_ = 0;
+    last_send_time_ = 0;
     set_state(CLOSED);
 
 ExitOK:
@@ -660,6 +670,16 @@ int32_t Connection::set_auto_release(bool auto_release)
 {
     auto_release_ = auto_release;
     return S_SUCCESS;
+}
+
+uint32_t Connection::last_recv_time(void) const
+{
+    return last_recv_time_;
+}
+
+uint32_t Connection::last_send_time(void) const
+{
+    return last_send_time_;
 }
 
 ConnectionManager* Connection::connection_manager(void)

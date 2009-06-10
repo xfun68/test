@@ -88,8 +88,9 @@ namespace socketor {
 
         State state(void) const;
         bool auto_release(void) const;
-        int32_t set_auto_release(bool auto_release);
-        // const ConnectionManager * const connection_manager(void) const;
+        int32_t set_auto_release(bool auto_release = true);
+        uint32_t last_recv_time(void) const;
+        uint32_t last_send_time(void) const;
         ConnectionManager* connection_manager(void);
 
     private:
@@ -133,6 +134,8 @@ namespace socketor {
         int32_t onEvents(const Event& event);
 
         int32_t init_ok_;
+        uint32_t last_recv_time_;
+        uint32_t last_send_time_;
         bool auto_release_;
         State state_;
         EventHandler default_event_handler_;

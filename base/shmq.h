@@ -82,14 +82,16 @@ public:
             shmid = shmGet(from_app_id | (to_app_id >> 4));
         }
         if (shmid < 0) {
+#ifdef DEBUG_TRACE
             PUT_ERR("#[SHMQ::initialize::shmCreate/shmGet]");
-            result = 0;
+#endif //  DEBUG_TRACE
             goto ExitError;
         }
 
         if ((addr = shmAt(shmid)) < 0) {
+#ifdef DEBUG_TRACE
             PUT_ERR("#[SHMQ::initialize::shmAt]");
-            result = 0;
+#endif //  DEBUG_TRACE
             goto ExitError;
         }
 
@@ -104,8 +106,9 @@ public:
         if (queue_.setQueueAddr((int8_t*)addr+sizeof(SHMState),
                 state_->elem_len_,
                 state_->size_) < 0) {
+#ifdef DEBUG_TRACE
             PUT_ERR("#[SHMQ::initialize::setQueueAddr]");
-            result = 0;
+#endif //  DEBUG_TRACE
             goto ExitError;
         }
 ExitOK:
@@ -128,9 +131,11 @@ ExitError:
             goto ExitOK;
         }
 
+#ifdef DEBUG_TRACE
         printf("#[release key=0x%08x shmid=%d]\n",
             ftok(getenv("PWD"), from_app_id_ | (to_app_id_ >> 4)),
             shmid_);
+#endif //  DEBUG_TRACE
 
         if (be_output_queue_) {
             state_->be_dest_ = 1;
