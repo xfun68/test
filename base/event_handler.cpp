@@ -289,8 +289,8 @@ int32_t EventHandler::onRelease(Connection* connection)
         << connection->port()
         << " is gonna be released"
         << endl;
-    connection->set_auto_release(true);
 #endif // DEBUG_TRACE
+    connection->set_auto_release(true);
     return S_SUCCESS;
 }
 

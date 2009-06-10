@@ -108,7 +108,7 @@ int32_t ConnectionManager::releaseConnectionList(void)
     return S_SUCCESS;
 }
 
-int32_t ConnectionManager::getConnctionNumber(void)
+int32_t ConnectionManager::getConnectionNumber(void)
 {
     return static_cast<int32_t>(conn_list_.size());
 }

@@ -55,7 +55,7 @@ namespace socketor
          */
         int32_t controlDel(Connection* conn);
         int32_t run(void);
-        int32_t getConnctionNumber(void);
+        int32_t getConnectionNumber(void);
 
     private:
         int32_t initializeConnectionList(void);
