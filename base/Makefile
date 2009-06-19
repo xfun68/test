@@ -29,7 +29,7 @@
 PROGRAM_NAME    := base
 
 # DEBUG can be set to YES to include debugging info, or NO otherwise
-DEBUG          	:= YES
+DEBUG          	:= NO
 
 # LIB can be set to YES to build a library not a executable program, or no otherwise
 LIB        		  := YES
@@ -47,6 +47,8 @@ SOURCES         := connection.cpp \
 		app_buffer.cpp \
 		shm.cpp \
 		shmq.cpp \
+		configer.cpp \
+		db_config.cpp \
 		tool.cpp
 
 # ------------  other name of the target  ----------------------------------------
@@ -86,10 +88,10 @@ INSTALL_PROGRAM := ${INSTALL} -m 755
 # ------------  compiler flags  ------------------------------------------------
 #DEBUG_CFLAGS      := -DLINUX -DDEBUG_TRACE -Wall -ansi -pedantic -O0 -g
 #DEBUG_CXXFLAGS    := -DLINUX -DDEBUG_TRACE -Wall -ansi -pedantic -O0 -g
-DEBUG_CFLAGS      := -DLINUX -Wall -ansi -pedantic -O0 -g
-DEBUG_CXXFLAGS    := -DLINUX -Wall -ansi -pedantic -O0 -g
-RELEASE_CFLAGS    := -DLINUX -Wall -ansi -pedantic -O3
-RELEASE_CXXFLAGS  := -DLINUX -Wall -ansi -pedantic -O3
+DEBUG_CFLAGS      := -DLINUX -DDEBUG -Wall -ansi -O0 -g
+DEBUG_CXXFLAGS    := -DLINUX -DDEBUG -Wall -ansi -O0 -g
+RELEASE_CFLAGS    := -DLINUX -Wall -ansi -O3
+RELEASE_CXXFLAGS  := -DLINUX -Wall -ansi -O3
 
 # ------------  linker flags  --------------------------------------------------
 DEBUG_LDFLAGS   := -g
@@ -129,7 +131,8 @@ endif
 GLOBAL_INC_DIR  =
 
 # ------------  private include directories  -----------------------------------
-LOCAL_INC_DIR   =
+LOCAL_INC_DIR   = $(ORACLE_HOME)/include \
+									$(ESUITE_HOME)/include
 
 # ------------  system libraries  (e.g. -lm )  ---------------------------------
 SYS_LIBS        = m \
@@ -142,10 +145,14 @@ GLOBAL_LIB_DIR  =
 GLOBAL_LIBS     =
 
 # ------------  private library directories  -----------------------------------
-LOCAL_LIB_DIR   =
+LOCAL_LIB_DIR   = $(ORACLE_HOME)/lib \
+									$(ESUITE_HOME)/lib
 
 # ------------  private libraries  (e.g. libxyz.a )  ---------------------------
-LOCAL_LIBS      =
+LOCAL_LIBS      = database \
+									tinyxml \
+									occi \
+									clntsh
 
 # ------------  archive generation ---------------------------------------------
 TARBALL_EXCLUDE = *.{o,gz,zip}

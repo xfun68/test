@@ -1,29 +1,33 @@
 // =====================================================================================
-// 
+//
 //       Filename:  tool.cpp
-// 
+//
 //    Description:  一些常用的工具类函数
-// 
+//
 //        Version:  1.0
 //        Created:  05/28/09 16:40:20
 //       Revision:  none
 //       Compiler:  g++
-// 
+//
 //         Author:  Will King (xfun), xfun68@foxmail.com
-//        Company:  
-// 
+//        Company:
+//
 // =====================================================================================
 
 #include "tool.h"
+#include "OperationCode.h"
+#include "SysLogManager.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/file.h>
 #include <sys/resource.h>
+#include <sys/time.h>
 
 int32_t getMaxFDSize(void)
 {
@@ -46,6 +50,25 @@ int32_t setMaxFDSize(int32_t size)
     } else {
         return 0;
     }
+}
+
+const char* timeString(void)
+{
+    struct timeval tv;
+    struct tm* timeptr = NULL;
+    static char result[64];
+
+    gettimeofday(&tv, NULL);
+    timeptr = localtime(&(tv.tv_sec));
+    sprintf(result, "%d-%02d-%02d_%02d:%02d:%02d.%06lu",
+        1900 + timeptr->tm_year,
+        timeptr->tm_mon+1,
+        timeptr->tm_mday,
+        timeptr->tm_hour,
+        timeptr->tm_min,
+        timeptr->tm_sec,
+        tv.tv_usec);
+    return result;
 }
 
 int32_t runInThread(void* (*threadFunc)(void*), void* args)
@@ -121,6 +144,74 @@ void instanceRestrict(const char* arg0)
 
     close(lockfd);
     printf("Instance Restrict OK! (PID = %d)\n", getpid());
+    return;
+}
+
+/*
+ * 日志输出函数
+ */
+void Logger(const uint32_t zone,
+    const uint32_t gateway,
+    const char*    type,     //desciption of operation
+    const int      ret,
+    const uint32_t user_id,
+    const uint32_t role_id,
+    const char*    format,
+    ...)
+{
+    int retcode = E_ERROR;
+    uint32_t buf_len = 0;
+    static char buf[1024] = {0};
+    va_list arg;
+
+    va_start(arg, format);
+    buf_len = vsprintf(buf, format, arg);
+    va_end(arg);
+
+    buf[buf_len] = '\0';
+
+    retcode = SysLogManager::output(
+        (SysLog::LOG_TYPE)(SysLog::LOG_INFO),
+        "%u|%u|%s|%d|%u|%u|%s\n",
+        zone,
+        gateway,
+        type,
+        ret,
+        user_id,
+        role_id,
+        buf);
+#ifdef DEBUG
+    printf("%s|%u|%u|%s|%d|%u|%u|%s\n",
+        timeString(),
+        zone,
+        gateway,
+        type,
+        ret,
+        user_id,
+        role_id,
+        buf);
+#endif // DEBUG
+
+    return;
+}
+
+void Logger(const char* format, ...)
+{
+    int retcode = E_ERROR;
+    uint32_t buf_len = 0;
+    static char buf[MAX_BUFFER_SIZE] = {0};
+    va_list arg;
+
+    va_start(arg, format);
+    buf_len = vsprintf(buf, format, arg);
+    va_end(arg);
+
+    buf[buf_len] = '\0';
+
+    retcode = SysLogManager::output((SysLog::LOG_TYPE)(SysLog::LOG_INFO), "%s\n", buf);
+#ifdef DEBUG
+    printf("%s %s\n", timeString(), buf);
+#endif // DEBUG
     return;
 }
 

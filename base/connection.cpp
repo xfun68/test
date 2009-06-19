@@ -20,8 +20,8 @@ namespace socketor
 
 Connection::Connection(void) :
     init_ok_(0),
-    last_recv_time_(0),
-    last_send_time_(0),
+    last_recv_time_(time(NULL)),
+    last_send_time_(time(NULL)),
     auto_release_(0),
     state_(CLOSED),
     default_event_handler_("ConnDefHandler"),
@@ -484,11 +484,13 @@ int32_t Connection::onEvents(const Event& event)
         }
         if (EPOLLERR & events) {
             retcode = event_handler_->onError(this);
+            recv();
             disconnect();
             goto ExitError;
         }
         if (EPOLLHUP & events) {
             retcode = event_handler_->onHup(this);
+            recv();
             disconnect();
             goto ExitError;
         }/*}}}*/

@@ -1,17 +1,17 @@
 // =====================================================================================
-// 
+//
 //       Filename:  tool.h
-// 
+//
 //    Description:  Ò»Ð©³£ÓÃµÄ¹¤¾ßÀàº¯Êý¼¯ºÏ
-// 
+//
 //        Version:  1.0
 //        Created:  05/28/09 16:41:02
 //       Revision:  none
 //       Compiler:  g++
-// 
+//
 //         Author:  Will King (xfun), xfun68@foxmail.com
-//        Company:  
-// 
+//        Company:
+//
 // =====================================================================================
 
 #ifndef _TOOL_H_
@@ -46,6 +46,11 @@ int32_t getMaxFDSize(void);
  *  # -1    Ê§°Ü
  */
 int32_t setMaxFDSize(int32_t size);
+
+/*
+ * ¹¦ÄÜ£º   ±íÊ¾µ±Ç°Ê±¼äµÄ×Ö·û´®££¨º¬Î¢Ãë£©
+ */
+const char* timeString(void);
 
 /*
  * ¹¦ÄÜ£º   Ïß³Ìº¯ÊýÄ£°å
@@ -87,6 +92,19 @@ const char* time2Str(time_t tm = time(NULL));
  * ¹¦ÄÜ£º   ½ø³ÌÊµÀýÎ¨Ò»Ô¼Êø
  */
 void instanceRestrict(const char* arg0);
+
+/*
+ * ÈÕÖ¾Êä³öº¯Êý
+ */
+void Logger(const uint32_t zone,
+    const uint32_t gateway,
+    const char*    type,
+    const int      ret,
+    const uint32_t user_id,
+    const uint32_t role_id,
+    const char*    format,
+    ...);
+void Logger(const char* format, ...);
 
 #endif //  _TOOL_H_
 

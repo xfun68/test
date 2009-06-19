@@ -20,6 +20,7 @@
 #include "shm.h"
 #include "loop_queue.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 const int32_t MAX_DATA_LEN = 1024;
 struct DataUnit {
@@ -44,7 +45,8 @@ public:
         size_(0),
         be_output_queue_(true),
         state_(NULL),
-        shmid_(-1)
+        shmid_(-1),
+        key_(-1)
     {
     }
 
@@ -75,11 +77,11 @@ public:
             goto ExitOK;
         }
 
+        key_ = from_app_id | (to_app_id >> 4);
         if (be_output_queue_) {
-            shmid = shmCreate(from_app_id | (to_app_id >> 4),
-                        sizeof(SHMState) + sizeof(T) * size);
+            shmid = shmCreate(key_, sizeof(SHMState) + sizeof(T) * size);
         } else {
-            shmid = shmGet(from_app_id | (to_app_id >> 4));
+            shmid = shmGet(key_);
         }
         if (shmid < 0) {
 #ifdef DEBUG_TRACE
@@ -187,6 +189,7 @@ private:
     bool be_output_queue_;
     SHMState* state_;
     int32_t shmid_;
+    key_t key_;
     LoopQueue<T> queue_;
 };
 

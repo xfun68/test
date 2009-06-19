@@ -11,10 +11,10 @@ public:
     typedef T* ElemTypePtr;
     typedef T& ElemTypeRef;
     typedef struct _QueueHdr_ {
-        uint32_t capacity_;
-        uint32_t elem_size_;
-        uint32_t head_;
-        uint32_t tail_;
+        int32_t capacity_;
+        int32_t elem_size_;
+        int32_t head_;
+        int32_t tail_;
     } QueueHdr, *QueueHdrPtr, &QueueHdrRef;
 
 public:
@@ -125,7 +125,7 @@ public:
         return size() == 0;
     }
 
-    uint32_t capacity(void) const {
+    int32_t capacity(void) const {
         if (NULL == hdr_) {
             return 0;
         } else {
@@ -133,11 +133,11 @@ public:
         }
     }
 
-    uint32_t size(void) const {
-        return rsize() > capacity() ? capacity() : rsize();
+    int32_t size(void) const {
+         return rsize() > capacity() ? capacity() : rsize();
     }
 
-    uint32_t rsize(void) const {
+    int32_t rsize(void) const {
         if (NULL == hdr_) {
             return 0;
         } else {
@@ -145,7 +145,7 @@ public:
         }
     }
 
-    uint32_t head(void) const {
+    int32_t head(void) const {
         if (NULL == hdr_) {
             return -1;
         } else {
@@ -157,7 +157,7 @@ public:
         }
     }
 
-    uint32_t tail(void) const {
+    int32_t tail(void) const {
         if (NULL == hdr_) {
             return -1;
         } else {
