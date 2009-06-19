@@ -91,6 +91,7 @@ namespace socketor {
         int32_t set_auto_release(bool auto_release = true);
         uint32_t last_recv_time(void) const;
         uint32_t last_send_time(void) const;
+        int32_t last_error(void) const;
         ConnectionManager* connection_manager(void);
 
     private:
@@ -136,6 +137,7 @@ namespace socketor {
         int32_t init_ok_;
         uint32_t last_recv_time_;
         uint32_t last_send_time_;
+        int32_t last_error_;
         bool auto_release_;
         State state_;
         EventHandler default_event_handler_;

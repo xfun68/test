@@ -1,14 +1,9 @@
 #include "connection.h"
+#include "tool.h"
 
 #include <string.h>
 #include <stdio.h>
 #include <iostream>
-
-#define ASSURE_SUCCESS(RESULT, RETCODE, STATEMENT) \
-    if (S_SUCCESS != (RETCODE = (STATEMENT))) {\
-        RESULT = RETCODE;\
-        goto ExitError;\
-    }
 
 using namespace std;
 
@@ -22,6 +17,7 @@ Connection::Connection(void) :
     init_ok_(0),
     last_recv_time_(time(NULL)),
     last_send_time_(time(NULL)),
+    last_error_(0),
     auto_release_(0),
     state_(CLOSED),
     default_event_handler_("ConnDefHandler"),
@@ -40,6 +36,7 @@ Connection::Connection(
     init_ok_(0),
     last_recv_time_(0),
     last_send_time_(0),
+    last_error_(0),
     auto_release_(0),
     state_(CLOSED),
     default_event_handler_("ConnDefHandler"),
@@ -63,6 +60,7 @@ Connection::Connection(
     init_ok_(0),
     last_recv_time_(0),
     last_send_time_(0),
+    last_error_(0),
     auto_release_(0),
     state_(CLOSED),
     default_event_handler_("ConnDefHandler"),
@@ -167,7 +165,8 @@ RE_RECV:
     }
 
     if (-1 == (bytes = ::recv(sockfd_, buffer, BUF_SIZE, MSG_DONTWAIT))) {
-        perror("recv");
+        last_error_ = errno;
+        PUT_ERR("::recv");
         bytes = 0;
         if (EINTR == errno) {
             goto RE_RECV;
@@ -204,7 +203,8 @@ RE_SEND:
         goto ExitError;
     }
     if (-1 == (bytes = ::send(sockfd_, buffer, bytes, MSG_DONTWAIT))) {
-        perror("send");
+        last_error_ = errno;
+        PUT_ERR("::send");
         bytes = 0;
         if (EINTR == errno) {
             goto RE_SEND;
@@ -383,7 +383,7 @@ ExitError:
 
 int32_t Connection::peek(void* buffer, 
     int32_t want_read_bytes, 
-    int32_t& real_read_bytes) 
+    int32_t& real_peek_bytes) 
 {
     int32_t result = E_ERROR;
     int32_t bytes = 0;
@@ -399,7 +399,7 @@ int32_t Connection::peek(void* buffer,
 
     result = S_SUCCESS;
 ExitError:
-    real_read_bytes = bytes;
+    real_peek_bytes = bytes;
     return result;
 }
 
@@ -485,13 +485,13 @@ int32_t Connection::onEvents(const Event& event)
         if (EPOLLERR & events) {
             retcode = event_handler_->onError(this);
             recv();
-            disconnect();
+            // disconnect();
             goto ExitError;
         }
         if (EPOLLHUP & events) {
             retcode = event_handler_->onHup(this);
             recv();
-            disconnect();
+            // disconnect();
             goto ExitError;
         }/*}}}*/
     } else {
@@ -682,6 +682,11 @@ uint32_t Connection::last_recv_time(void) const
 uint32_t Connection::last_send_time(void) const
 {
     return last_send_time_;
+}
+
+int32_t Connection::last_error(void) const
+{
+    return last_error_;
 }
 
 ConnectionManager* Connection::connection_manager(void)
