@@ -16,3 +16,5 @@ cat 2009-06-1* | grep "|UserIBPay|-145[14].*Subject_ID = 3" | awk -F"[|,]" '{pri
 # 金元宝消费记录 -1454 或者 -1451 Code Time Subject Price DiscountPrice DeitailID
 cat 2009-06-1* | grep "|UserIBPay|-145[14].*Subject_ID = 3" | awk -F"[|,]" '{printf "%s %s %s%s%s%s\n", $15, $18, $20, $22, $23, $24}' | sort | uniq
 
+# 将time_t转换成可读时间
+grep "UserIBPay.*|7119351"  2009-06-2* | awk -F"[ |=,]" '{printf "%s %s %s %04s %s\n", $25, $35, strftime("%Y-%m-%d_%H:%M:%S",$40), $64, $69}' | cat -n
