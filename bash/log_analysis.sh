@@ -18,3 +18,6 @@ cat 2009-06-1* | grep "|UserIBPay|-145[14].*Subject_ID = 3" | awk -F"[|,]" '{pri
 
 # 将time_t转换成可读时间
 grep "UserIBPay.*|7119351"  2009-06-2* | awk -F"[ |=,]" '{printf "%s %s %s %04s %s\n", $25, $35, strftime("%Y-%m-%d_%H:%M:%S",$40), $64, $69}' | cat -n
+
+### 统计操作结果为0的记录
+awk -F"[| ]" '{if ($9 == 0 && $8 != "Gateway" && $8 != "N/A") printf "%s %s %-20s %5s %11s %-32s\n", $1, $2, $8, $9, $10, $14}' 2009-06-22* | cat -n
