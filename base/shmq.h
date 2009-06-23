@@ -25,6 +25,7 @@
 const int32_t MAX_DATA_LEN = 1024;
 struct DataUnit {
     int32_t len;
+    int32_t fd;
     int8_t data[MAX_DATA_LEN];
 };
 
