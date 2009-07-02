@@ -29,7 +29,7 @@
 PROGRAM_NAME    := base
 
 # DEBUG can be set to YES to include debugging info, or NO otherwise
-DEBUG          	:= YES
+DEBUG          	:= NO
 
 # LIB can be set to YES to build a library not a executable program, or no otherwise
 LIB        		  := YES

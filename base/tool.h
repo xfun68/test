@@ -96,7 +96,7 @@ void instanceRestrict(const char* arg0);
 /*
  * 日志输出函数
  */
-void Logger(const uint32_t zone,
+void logger(const uint32_t zone,
     const uint32_t gateway,
     const char*    type,
     const int      ret,
@@ -104,7 +104,7 @@ void Logger(const uint32_t zone,
     const uint32_t role_id,
     const char*    format,
     ...);
-void Logger(const char* format, ...);
+void logger(const char* format, ...);
 
 #endif //  _TOOL_H_
 

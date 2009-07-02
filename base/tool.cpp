@@ -150,7 +150,7 @@ void instanceRestrict(const char* arg0)
 /*
  * 日志输出函数
  */
-void Logger(const uint32_t zone,
+void logger(const uint32_t zone,
     const uint32_t gateway,
     const char*    type,     //desciption of operation
     const int      ret,
@@ -195,7 +195,7 @@ void Logger(const uint32_t zone,
     return;
 }
 
-void Logger(const char* format, ...)
+void logger(const char* format, ...)
 {
     int retcode = E_ERROR;
     uint32_t buf_len = 0;
