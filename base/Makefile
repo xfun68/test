@@ -49,7 +49,8 @@ SOURCES         := connection.cpp \
 		shmq.cpp \
 		configer.cpp \
 		db_config.cpp \
-		tool.cpp
+		tool.cpp \
+		thread.cpp
 
 # ------------  other name of the target  ----------------------------------------
 ifeq (YES,${LIB})
