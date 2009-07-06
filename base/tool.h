@@ -91,7 +91,8 @@ const char* time2Str(time_t tm = time(NULL));
 /*
  * 功能：   进程实例唯一约束
  */
-void instanceRestrict(const char* arg0);
+void instanceLock(const char* arg0);
+void instanceUnlock(const char* arg0);
 
 /*
  * 日志输出函数

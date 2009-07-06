@@ -102,7 +102,7 @@ const char* time2Str(time_t tm)
     return result;
 }
 
-void instanceRestrict(const char* arg0)
+void instanceLock(const char* arg0)
 {
     int lockfd = 0;
     int bytesread = 0;
@@ -114,36 +114,93 @@ void instanceRestrict(const char* arg0)
 
     lockfd = open(lockfile, O_RDWR | O_CREAT, 0644);
     if (-1 == lockfd) {
-        printf("Open file \"%s\" failed, program closed!\n"
-            "Press any key to continue ... \n",
+        printf("Open lock file \"%s\" FAILED\n"
+            "Program closed, press any key to continue... \n",
             lockfile);
         exit(1);
     }
     if (-1 == flock(lockfd, LOCK_EX | LOCK_NB) ) {
         bytesread = read(lockfd, pbuf, sizeof(pbuf)-1);
         pbuf[bytesread] = 0;
-        printf("Already have a eChargeServer(PID = %s) "
-            "running in this directory, program closed!\n"
-            "Press any key to continue ... \n",
+        printf("Already have a \"arg0(PID = %s)\" running in this directory, lock FAILED\n"
+            "program closed, press any key to continue... \n",
             pbuf);
         exit(1);
     }
     if (-1 == ftruncate(lockfd, 0)) {
-        printf("Clear file \"%s\" failed, program closed!\n"
-            "Press any key to continue ... \n",
+        printf("Clear lock file \"%s\" FAILED\n"
+            "Program closed, press any key to continue... \n",
             lockfile);
         exit(1);
     }
     snprintf(pbuf, sizeof(pbuf), "%d", getpid());
     if ((ssize_t)strlen(pbuf) != write(lockfd, pbuf, strlen(pbuf))) {
-        printf("Record PID(%d) to file \"%s\" failed, program closed!\n"
-            "Press any key to continue ... \n",
-            getpid(), lockfile);
+        printf("Record PID(%d) to lock file \"%s\" FAILED\n"
+            "Program closed, press any key to continue... \n",
+            getpid(),
+            lockfile);
         exit(1);
     }
 
     close(lockfd);
-    printf("Instance Restrict OK! (PID = %d)\n", getpid());
+    printf("Instance (PID = %d) lock OK\n", getpid());
+    return;
+}
+
+void instanceUnlock(const char* arg0)
+{
+    int result = -1;
+    int lockfd = 0;
+    int bytesread = 0;
+    char pbuf[32] = {0};
+    char lockfile[64] = {0};
+
+    snprintf(lockfile, sizeof(lockfile)-1, "%s.pid", arg0);
+    lockfile[sizeof(lockfile)-1] = '\0';
+
+    lockfd = open(lockfile, O_RDWR, 0644);
+    if (-1 == lockfd) {
+        printf("Open lock file \"%s\" FAILED\n",
+            lockfile);
+        result = errno;
+        goto ExitError;
+    }
+
+    bytesread = read(lockfd, pbuf, sizeof(pbuf)-1);
+    pbuf[bytesread] = 0;
+    if (getpid() != atoi(pbuf)) {
+        printf("This lock file(PID = %s) is not held by me\n",
+            pbuf);
+        result = -1;
+        goto ExitError;
+    }
+
+    if (-1 == flock(lockfd, LOCK_UN | LOCK_NB) ) {
+        printf("Call flock() to unlock FAILED\n");
+        result = errno;
+        goto ExitError;
+    }
+    if (-1 == remove(lockfile)) {
+        printf("Remove lock file \"%s\" FAILED\n",
+            lockfile);
+        result = errno;
+        goto ExitError;
+    }
+
+    result = 0;
+ExitError:
+    if (lockfd != 0) {
+        close(lockfd);
+    }
+    if (result != 0) {
+        printf("Instance (PID = %d) unlock FAILED(%d)\n",
+            getpid(),
+            result);
+    } else {
+        printf("Instance (PID = %d) unlock OK\n",
+            getpid());
+    }
+
     return;
 }
 
