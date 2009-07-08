@@ -88,18 +88,47 @@ ExitError:
     return result;
 }
 
-const char* time2Str(time_t tm)
+const char* time2Str(time_t tm, char* time_string)
 {
     struct tm* timeptr = localtime(&tm);
-    static char result[64];
-    sprintf(result, "%d-%02d-%02d_%02d:%02d:%02d",
+    static char def_string[64] = {'\0'};
+
+    if (NULL == time_string) {
+        time_string = def_string;
+    }
+
+    snprintf(time_string, 63, "%u(%d-%02d-%02d_%02d:%02d:%02d)",
+        (uint32_t)tm,
         1900 + timeptr->tm_year,
         timeptr->tm_mon+1,
         timeptr->tm_mday,
         timeptr->tm_hour,
         timeptr->tm_min,
         timeptr->tm_sec);
-    return result;
+
+    return time_string;
+}
+
+const char* ip2Str(uint32_t ip, char* ip_string)
+{
+    uint8_t* pucIPSeg = NULL;
+    static char def_string[64] = {'\0'};
+
+    if (NULL == ip_string) {
+        ip_string = def_string;
+    }
+
+    pucIPSeg = (uint8_t*)&ip;
+    snprintf(ip_string, 63, "0x%08x(%u.%u.%u.%u)\n", 
+        ip,
+#if (defined(WIN32) || defined(LINUX))
+        pucIPSeg[3], pucIPSeg[2], pucIPSeg[1], pucIPSeg[0]
+#else
+        pucIPSeg[0], pucIPSeg[1], pucIPSeg[2], pucIPSeg[3]
+#endif
+        );
+
+    return ip_string;
 }
 
 void instanceLock(const char* arg0)

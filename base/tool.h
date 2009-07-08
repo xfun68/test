@@ -86,7 +86,12 @@ int32_t runInThread(void* (*threadFunc)(void*), void* args);
 /*
  * 功能：   转换整型时间为可读字符串时间
  */
-const char* time2Str(time_t tm = time(NULL));
+const char* time2Str(time_t tm = time(NULL), char* time_string = NULL);
+
+/* 
+ *功能：    转换整数IP为可读地址
+ */
+const char* ip2Str(uint32_t ip, char* ip_string = NULL);
 
 /*
  * 功能：   进程实例唯一约束
