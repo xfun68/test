@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <inttypes.h>
+#include <sys/socket.h>
 
 #define ASSURE_SUCCESS(RESULT, RETCODE, STATEMENT); \
     if (S_SUCCESS != (RETCODE = (STATEMENT))) {\
@@ -86,12 +87,13 @@ int32_t runInThread(void* (*threadFunc)(void*), void* args);
 /*
  * 功能：   转换整型时间为可读字符串时间
  */
-const char* time2Str(time_t tm = time(NULL), char* time_string = NULL);
+const char* time2str(time_t tm = time(NULL), char* time_string = NULL);
 
 /* 
- *功能：    转换整数IP为可读地址
+ *功能：    转换整数IP为可读地址，或逆转换
  */
-const char* ip2Str(uint32_t ip, char* ip_string = NULL);
+const char* ip2str(uint32_t ip, char* ip_string = NULL);
+uint32_t str2ip(const char* ip_string, int32_t af = AF_INET);
 
 /*
  * 功能：   进程实例唯一约束

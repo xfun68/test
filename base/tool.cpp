@@ -88,7 +88,7 @@ ExitError:
     return result;
 }
 
-const char* time2Str(time_t tm, char* time_string)
+const char* time2str(time_t tm, char* time_string)
 {
     struct tm* timeptr = localtime(&tm);
     static char def_string[64] = {'\0'};
@@ -109,7 +109,7 @@ const char* time2Str(time_t tm, char* time_string)
     return time_string;
 }
 
-const char* ip2Str(uint32_t ip, char* ip_string)
+const char* ip2str(uint32_t ip, char* ip_string)
 {
     uint8_t* pucIPSeg = NULL;
     static char def_string[64] = {'\0'};
@@ -129,6 +129,16 @@ const char* ip2Str(uint32_t ip, char* ip_string)
         );
 
     return ip_string;
+}
+
+uint32_t str2ip(const char* ip_string, int32_t af)
+{
+    struct sockaddr_in sain;
+    if (inet_pton(af, ip_string, &sain.sin_addr) == 1) {
+        return ntohl(sain.sin_addr.s_addr);
+    } else {
+        return 0;
+    }
 }
 
 void instanceLock(const char* arg0)
