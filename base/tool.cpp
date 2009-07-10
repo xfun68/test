@@ -119,7 +119,7 @@ const char* ip2str(uint32_t ip, char* ip_string)
     }
 
     pucIPSeg = (uint8_t*)&ip;
-    snprintf(ip_string, 63, "0x%08x(%u.%u.%u.%u)\n", 
+    snprintf(ip_string, 63, "%u(%u.%u.%u.%u)\n",
         ip,
 #if (defined(WIN32) || defined(LINUX))
         pucIPSeg[3], pucIPSeg[2], pucIPSeg[1], pucIPSeg[0]

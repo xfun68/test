@@ -34,8 +34,8 @@ Connection::Connection(
     uint16_t port,
     EventHandler* event_handler) :
     init_ok_(0),
-    last_recv_time_(0),
-    last_send_time_(0),
+    last_recv_time_(time(NULL)),
+    last_send_time_(time(NULL)),
     last_error_(0),
     auto_release_(0),
     state_(CLOSED),
@@ -58,8 +58,8 @@ Connection::Connection(
     uint16_t port,
     EventHandler* event_handler) :
     init_ok_(0),
-    last_recv_time_(0),
-    last_send_time_(0),
+    last_recv_time_(time(NULL)),
+    last_send_time_(time(NULL)),
     last_error_(0),
     auto_release_(0),
     state_(CLOSED),

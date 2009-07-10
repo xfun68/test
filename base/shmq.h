@@ -23,8 +23,9 @@
 #include <unistd.h>
 
 const int32_t MAX_DATA_LEN = 1024;
-const uint32_t DU_CLOSE_CONNECT     = 0x00000001;
-const uint32_t DU_NOT_SEND_RES      = 0x00000002;
+const uint32_t GS_CLOSE_CONNECT     = 0x00000001;
+const uint32_t GS_NOT_SEND_RES      = 0x00000002;
+const uint32_t GS_NOT_VERIFIED      = 0x00000002;
 
 struct DataUnit {
     int32_t len;
