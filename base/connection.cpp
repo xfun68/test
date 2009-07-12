@@ -485,13 +485,11 @@ int32_t Connection::onEvents(const Event& event)
         if (EPOLLERR & events) {
             retcode = event_handler_->onError(this);
             recv();
-            // disconnect();
             goto ExitError;
         }
         if (EPOLLHUP & events) {
             retcode = event_handler_->onHup(this);
             recv();
-            // disconnect();
             goto ExitError;
         }/*}}}*/
     } else {
