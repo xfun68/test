@@ -107,4 +107,22 @@ int main(int argc, char* argv[])
     ivalue = strtol(string, NULL, 0);
     printf("%s -> %d\n", string, ivalue);
 
+    // 测试一下初始化问题
+    char abc[11] = {'\0'};
+    ivalue = strtol(abc, NULL, 0);
+    printf("%s -> %d\n", abc, ivalue);
+
+    for (uint32_t i = 1; i < sizeof(abc); ++i) {
+        printf("%d", abc[i]);
+    }
+    putchar('\n');
+
+    char def[11];
+    ivalue = strtol(def, NULL, 0);
+    printf("%s -> %d\n", def, ivalue);
+
+    for (uint32_t i = 1; i < sizeof(def); ++i) {
+        printf("%d", def[i]);
+    }
+    putchar('\n');
 }
