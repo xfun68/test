@@ -312,3 +312,42 @@ void logger(const char* format, ...)
     return;
 }
 
+void trimLeft(char *buffer)
+{
+    ASSERT(buffer != NULL);
+    char * pcBuf = buffer;
+
+    for (uint32_t i = 0; i < strlen(pcBuf); i++) {
+        if (pcBuf[i] != '\t' && pcBuf[i] != ' ') {
+            strcpy(buffer, pcBuf + i);
+            buffer[strlen(pcBuf)] = 0;
+            break;
+        }
+    }
+
+    return;
+}
+
+void trimRight(char *buffer)
+{
+    ASSERT(buffer != NULL);
+
+    char* pcBuf = buffer;
+    for (int32_t i = strlen(pcBuf) - 1; i >= 0; i--) {
+        if (pcBuf[i] != '\t' && pcBuf[i] != ' ' && pcBuf[i] != '\n') {
+            buffer[i + 1] = 0;
+            break;
+        }
+    }
+
+    return;
+}
+
+void trim(char *buffer)
+{
+    ASSERT(buffer != NULL);
+    trimLeft(buffer);
+    trimRight(buffer);
+    return;
+}
+

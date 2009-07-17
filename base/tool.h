@@ -114,5 +114,12 @@ void logger(const uint32_t zone,
     ...);
 void logger(const char* format, ...);
 
+/*
+ * È¥¿Õ¸ñº¯Êý
+ */
+void trimLeft(char *buffer);
+void trimRight(char *buffer);
+void trim(char *buffer);
+
 #endif //  _TOOL_H_
 

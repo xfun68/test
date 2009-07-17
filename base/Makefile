@@ -50,7 +50,8 @@ SOURCES         := connection.cpp \
 		configer.cpp \
 		db_config.cpp \
 		tool.cpp \
-		thread.cpp
+		thread.cpp \
+		aes.cpp
 
 # ------------  other name of the target  ----------------------------------------
 ifeq (YES,${LIB})
