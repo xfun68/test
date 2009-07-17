@@ -136,7 +136,7 @@ ExitError:
 #endif //  DEBUG_TRACE
 
         if (be_output_queue_) {
-            state_->be_dest_ = 1;
+            state_->be_dest_ = true;
             shmDestroy(shmid_);
         }
         shmDt(state_);
@@ -171,7 +171,7 @@ ExitOK:
     bool isValid(void)
     {
         if (NULL != state_) {
-            if ((queue_.size() > 0) || (0 == state_->be_dest_)) {
+            if ((queue_.size() > 0) || !state_->be_dest_) {
                 return 1;
             }
         }
