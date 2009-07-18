@@ -76,8 +76,8 @@ INSTALL_LIB 		:= ${INSTALL} -m 755
 INSTALL_PROGRAM := ${INSTALL} -m 755
 
 # ------------  compiler flags  ------------------------------------------------
-DEBUG_CFLAGS      := -DLINUX -DDEBUG_TRACE -Wall -ansi -pedantic -O0 -g
-DEBUG_CXXFLAGS    := -DLINUX -DDEBUG_TRACE -Wall -ansi -pedantic -O0 -g
+DEBUG_CFLAGS      := -DLINUX -DDEBUG -Wall -ansi -pedantic -O0 -g
+DEBUG_CXXFLAGS    := -DLINUX -DDEBUG -Wall -ansi -pedantic -O0 -g
 RELEASE_CFLAGS    := -DLINUX -Wall -ansi -pedantic -O3
 RELEASE_CXXFLAGS  := -DLINUX -Wall -ansi -pedantic -O3
 

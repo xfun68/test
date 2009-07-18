@@ -157,3 +157,10 @@ set foldmethod=marker
 set foldclose=all
 set foldcolumn=4
 
+" taglist
+let Tlist_Sort_Type = "name"
+let Tlist_Use_Right_Window = 1
+let Tlist_Exit_OnlyWindow = 1
+let Tlist_GainFocus_On_ToggleOpen = 1
+map <silent> <F8> :TlistToggle<cr>
+

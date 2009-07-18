@@ -28,7 +28,7 @@ alias remake='make clean && make;'
 alias egrep='grep -E -a -i --color'
 
 # erating 所有进程
-alias erating_processes='echo "((USER|UID|PID).*(CMD|COMMAND))|rating|ausvr|chargesvr|paysvr|logsvr|monitsvr"'
+alias erating_processes='echo "((USER|UID|PID).*(CMD|COMMAND))|rating|charge|ausvr|chargesvr|paysvr|logsvr|monitsvr"'
 
 # dev 开发时使用的所有进程
 alias dev_processes='echo "((USER|UID|PID).*(CMD|COMMAND))|./gatesvr|./ipccli|./tcpcli"'
@@ -72,5 +72,6 @@ PATH=$HOME/libexec/git-core:$PATH
 export PATH
 export ORACLE_HOME=$HOME/src/oracle
 export ESUITE_HOME=$HOME/src/esuite
+export PROJECT_HOME=$HOME/project
 export LD_LIBRARY_PATH=$HOME/lib
 
