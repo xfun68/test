@@ -54,7 +54,7 @@
 
 执行`./migrate.sh erating/uosdev@uosdev.lk --reset`即可在修复操作开始前，先删除**开发库**中的相关数据并重新导入线上的错误数据。
 
-切莫在线上使用--reset
+**切莫在线上使用--reset**
 
 在开发期间，可能线上已经又有了新的错误充值数据。如果在第二步的输出不是上面提示的那4行，请联系[__王晓峰__](wangxiaofeng@linekong.com)
 
