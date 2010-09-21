@@ -3,16 +3,16 @@
 ### 操作内容
 
 * 查询存在错误充值数据的账户信息
+      Users with wrong charge msgs and their duplicated name.
+      -------------------------------------------------------
+      帐号ID     帐号名
+      1533934694 chenjunj2
+      1534156628 chenjunJ2
+      1534003370 llh1973-com
+      1534118551 LLH1973-COM
+      1533561632 yi529272252
+      1533661924 YI529272252
   如果此处输出为空，则表示没有帐号发生因充值导致创建重复帐号的问题。
-     Users with wrong charge msgs and their duplicated name.
-     -------------------------------------------------------
-     帐号ID     帐号名
-     1533934694 chenjunj2
-     1534156628 chenjunJ2
-     1534003370 llh1973-com
-     1534118551 LLH1973-COM
-     1533561632 yi529272252
-     1533661924 YI529272252
 
 * 查询错误充值数据的信息
   如果此处输出为空，意义同上。
@@ -26,26 +26,26 @@
 
 * 根据上一步查询的信息对数据进行修复
   先创建需要的函数，然后调用函数执行修复数据操作，修复完毕后再将先前创建的函数drop掉。
-    Start processing wrong charge msgs ...
-    -------------------------------------------------------
-    Create needed functions
-    Processing data ...
-    Drop functions
-    
-    Finished.
+      Start processing wrong charge msgs ...
+      -------------------------------------------------------
+      Create needed functions
+      Processing data ...
+      Drop functions
+      
+      Finished.
 
 * 对处理结果进行检测
   这里的检测操作实际就是第一步和第二步的重复执行。
-    Checking ...
-    Users with wrong charge msgs and their duplicated name.
-    -------------------------------------------------------
-    此处应该没有输出了，否则就是修复失败
-    Wrong charge msg info.
-    -------------------------------------------------------
-    此处应该没有输出了，否则就是修复失败
+      Checking ...
+      Users with wrong charge msgs and their duplicated name.
+      -------------------------------------------------------
+      # 此处应该没有输出了，否则就是修复失败
+      Wrong charge msg info.
+      -------------------------------------------------------
+      # 此处应该没有输出了，否则就是修复失败
 
 * 结束
-    Done!
+      Done!
 
 ### 关于错误数据
 已经将《西游记-PPS》的错误充值相关数据导出到imp_init_data.sql文件中。
