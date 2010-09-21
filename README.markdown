@@ -12,10 +12,14 @@
 **修改方案：**
 
 1 查询出有问题的充值记录的详细信息
+
 2 从错误的账户中删除全部充值数据
   共3个表：UMS_USER_FUND、UMS_USER_FUND_DETAIL、LOG_USER_FUND_DETAIL。
+
 3 使用第一步获取的充值信息调用PKG_BALANCE.innerCharge()为正确的账户充值
+
 4 删除错误的帐号（大写帐号名的帐号）
+
 5 检验修复结果
 
 ### 使用方法
