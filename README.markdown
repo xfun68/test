@@ -10,6 +10,7 @@
 此次更新，即为修改此问题。
 
 **修改方案：**
+
 1 查询出有问题的充值记录的详细信息
 2 从错误的账户中删除全部充值数据
   共3个表：UMS_USER_FUND、UMS_USER_FUND_DETAIL、LOG_USER_FUND_DETAIL。
